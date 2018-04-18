@@ -3,9 +3,10 @@
 library("Canopy")
 source("https://gist.githubusercontent.com/mfoll/a4dfbb92068dc559f130/raw/714dc8c2e97987fd4385dcef2722b3ef986d38d6/get_vcf_data.r")
 
-
-load('/home/pgm/Workspace/MPM/marathon/canopy/demo/preprocessed.rda')
-
+## test data
+#load('/home/pgm/Workspace/MPM/marathon/canopy/demo/preprocessed.rda')
+# data("MDA231")
+##
 
 ##########################################
 ## Retrieve arguments
@@ -249,22 +250,8 @@ colnames(Y)[1] = "non-cna_region"
 Y[rowSums(Y) == 0, 1] = 1
 
 
-# C = C[rowSums(C) > 0, ] # Remove regions with no CNA event
-
-
-
-
-# data("MDA231")
-# projectname = MDA231$projectname ## name of project
-# R = MDA231$R; R ## mutant allele read depth (for SNAs)
-# X = MDA231$X; X ## total depth (for SNAs)
-# WM = MDA231$WM; WM ## observed major copy number (for CNA regions)
-# Wm = MDA231$Wm; Wm ## observed minor copy number (for CNA regions)
-# epsilonM = MDA231$epsilonM ## standard deviation of WM, pre-fixed here
-# epsilonm = MDA231$epsilonm ## standard deviation of Wm, pre-fixed here
-# ## whether CNA regions harbor specific CNAs (only needed for overlapping CNAs)
-# C = MDA231$C; C
-# Y = MDA231$Y; Y ## whether SNAs are affected by CNAs
-
+##########################################
+## Process Canopy
+##########################################
 
 
