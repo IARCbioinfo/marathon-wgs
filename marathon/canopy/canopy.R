@@ -78,8 +78,8 @@ chromosomes_impacted = unique(ascn_total$chr)
 all_regions = c()
 for (chr in chromosomes_impacted) {
   sub_ascn = ascn_total[ascn_total$chr == chr, ] # all ascn of a chromosome
-  starts   = sub_ascn$st_snp
-  ends     = sub_ascn$end_snp
+  starts   = sub_ascn$st_bp
+  ends     = sub_ascn$end_bp
   points   = sort(unique(c(starts, ends)))
   new_starts = points[1:(length(points)-1)] # all points except last one are starts
   new_ends   = points[2:(length(points))] # all points except first one are ends
@@ -102,7 +102,7 @@ for (i in seq(1:nrow(ascn_total))) {
     C_end   = as.numeric(unlist(strsplit(unlist(strsplit(rownames(C[j, ]), ":"))[2], "-"))[2])
     
     if (paste("chr", copy_number$chr, sep="") == C_chr) {
-      if (C_start >= as.numeric(copy_number$st_snp) && C_start < as.numeric(copy_number$end_snp)) {
+      if (C_start >= as.numeric(copy_number$st_bp) && C_start < as.numeric(copy_number$end_bp)) {
         C[j, i] = 1
       }
     }
@@ -131,7 +131,7 @@ build_matrices = function(ascn_tumor, ascn_tumor_index, WM, Wm, epsM, epsm) {
       copy_number = ascn_tumor[j, ]
       copy_number$chr = gsub("X", "23", copy_number$chr)
       copy_number$chr = gsub("Y", "24", copy_number$chr)
-      if (paste("chr", copy_number$chr, sep="") == C_chr && C_start >= as.numeric(copy_number$st_snp) && C_start < as.numeric(copy_number$end_snp) && is.na(WM[i, ascn_tumor_index])) {
+      if (paste("chr", copy_number$chr, sep="") == C_chr && C_start >= as.numeric(copy_number$st_bp) && C_start < as.numeric(copy_number$end_bp) && is.na(WM[i, ascn_tumor_index])) {
         WM[i, ascn_tumor_index] = copy_number$Major_copy
         Wm[i, ascn_tumor_index] = copy_number$Minor_copy
         epsM[i, ascn_tumor_index] = copy_number$Major.sd
@@ -198,7 +198,7 @@ VCF_somatic_tumor2_positions_t1 = cbind(VCF_somatic_tumor2_positions_t1, VCF_som
 DPCounts_positions1_in_tumor2 = unlist(lapply(1:nrow(VCF_somatic_tumor2_positions_t1), function(i) get_genotype(VCF_somatic_tumor2_positions_t1[i,10], VCF_somatic_tumor2_positions_t1[i, 9], "NR")))
 AOCounts_positions1_in_tumor2 = unlist(lapply(1:nrow(VCF_somatic_tumor2_positions_t1), function(i) get_genotype(VCF_somatic_tumor2_positions_t1[i,10], VCF_somatic_tumor2_positions_t1[i, 9], "NV")))
 
-# Generate R input
+# Generate R & X inputs
 Rt1 = as.data.frame(cbind(AOCounts_tumor1, AOCounts_positions1_in_tumor2, VCF_somatic_tumor1$uniqID))
 rownames(Rt1) = VCF_somatic_tumor1$uniqID
 Rt2 = as.data.frame(cbind(AOCounts_positions2_in_tumor1, AOCounts_tumor2, VCF_somatic_tumor2$uniqID))
@@ -217,8 +217,39 @@ colnames(Xt1) = colnames(Xt2_dedup) = c(tumor1_id, tumor2_id)
 X = rbind(Xt1, Xt2_dedup)
 X = X[,1:ncol(X)-1]
 
+# Generate Y input
+Y_column_names = rownames(C)
+Y_row_names    = rownames(X)
+Y = as.data.frame(matrix(0, nrow=length(Y_row_names), ncol=length(Y_column_names)))
+rownames(Y) = Y_row_names
+colnames(Y) = Y_column_names
+
+# process all positions and fill Y matrix with 1 when this position is in a CNA region
+for (i in seq(1:nrow(Y))) {
+  Ysna_chr      = unlist(strsplit(rownames(Y)[i], '_'))[1]
+  if (Ysna_chr == "chrX") { Ysna_chr = "chr23" }
+  if (Ysna_chr == "chrY") { Ysna_chr = "chr24" }
+  Ysna_position = as.numeric(unlist(strsplit(rownames(Y)[i], '_'))[2])
+  
+  for (j in seq(1:ncol(Y))) {
+    Ycna = unlist(strsplit(colnames(Y)[j], ':'))
+    Ycna_chr   = Ycna[1]
+    Ycna_start = as.numeric(unlist(strsplit(Ycna[2], "-"))[1])
+    Ycna_end   = as.numeric(unlist(strsplit(Ycna[2], "-"))[2])
+    
+    if (Ysna_chr == Ycna_chr && Ysna_position >= Ycna_start && Ysna_position <= Ycna_end) {
+      Y[i, j] = 1 # [row, col]
+    }
+  }
+}
+
+# Finally update non cna regions
+Y = cbind(rep(0, nrow(Y)), Y)
+colnames(Y)[1] = "non-cna_region"
+Y[rowSums(Y) == 0, 1] = 1
 
 
+# C = C[rowSums(C) > 0, ] # Remove regions with no CNA event
 
 
 
