@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_12323_N_B00JAKE B00JAKC B00JAKD
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_19392_N_B00JAKR B00JAKP B00JAKQ
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_5009_N_B00JAJD B00JAJB B00JAJC
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_6063_N_B00JAJG B00JAJE B00JAJF
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_8329_N_B00JAKG B00JAKF B00JAKH
+/home/pgm/Workspace/MPM/R_controle_qualite/intersect_germline_somatic/somatic_germline_fractions_alleliques.R M662_DA_LB110287_N_B00JAK1 B00JAK0 B00JAK2
