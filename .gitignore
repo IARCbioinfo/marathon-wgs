@@ -1,6 +1,8 @@
 *.ods
 *.svg
 *.png
+*.vcf*
+*.rda
 *lock*
 ref_files
 VCF_finaux
@@ -14,7 +16,6 @@ scripts_colbalt/somatic_mpileup
 scripts_colbalt/calling_somatic_genotype/input
 scripts_colbalt/calling_somatic_genotype/output
 scripts_colbalt/calling_somatic_genotype/log
-*.rda
 marathon/canopy/demo
 marathon/canopy/input_C_a_valider
 marathon/falcon/demo

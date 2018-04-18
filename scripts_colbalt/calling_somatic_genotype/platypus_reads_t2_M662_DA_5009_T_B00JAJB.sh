@@ -6,7 +6,7 @@ module load platypus
 APPDIR=/ccc/cont007/dsku/lautrec/home/app/fg/fg/products/platypus-0.8.1/bin
 
 TUMORBAM=/ccc/scratch/cont007/fg0094/soudadel/MESO/BAM_post_al/tumor/M662_DA_5009_T_B00JAJB.pa.bam
-INPUTVCF=/ccc/work/cont007/fg0094/soudadel/MESO/somatic_read_count_t2/input/M662_DA_5009_T_B00JAJC.normalized.vcf.gz
+INPUTVCF=/ccc/work/cont007/fg0094/soudadel/MESO/somatic_read_count_t2/input/M662_DA_5009_T_B00JAJC.PASS.vcf.gz
 OUTPUTVCF=/ccc/work/cont007/fg0094/soudadel/MESO/somatic_read_count_t2/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf
 REFFILES=/ccc/work/cont007/fg0094/soudadel/MESO/calling_somatic/ref_files
 

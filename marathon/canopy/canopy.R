@@ -14,24 +14,24 @@ args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
 ##
-input_folder          = args[1]
-patient_id            = args[2]
-tumor1_id             = args[3]
-tumor2_id             = args[4]
-input_somatic_VCF_t1  = args[5]
-input_somatic_VCF_t2  = args[6]
-input_mpileup_t1      = args[7]
-input_mpileup_t2      = args[8]
+input_folder                      = args[1]
+patient_id                        = args[2]
+tumor1_id                         = args[3]
+tumor2_id                         = args[4]
+input_somatic_VCF_t1              = args[5]
+input_somatic_VCF_t2              = args[6]
+input_somatic_VCF_t1_positions_t2 = args[7]
+input_somatic_VCF_t2_positions_t1 = args[8]
 
 ##
-input_folder          = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
-patient_id            = "5009"
-tumor1_id             = "B00JAJB"
-tumor2_id             = "B00JAJC"
-input_somatic_VCF_t1  = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
-input_somatic_VCF_t2  = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
-input_mpileup_t1      = "/home/pgm/Workspace/MPM/VCF_finaux/other_tumor_coverage/M662_DA_5009_T_B00JAJB.mpileup.tsv"
-input_mpileup_t2      = "/home/pgm/Workspace/MPM/VCF_finaux/other_tumor_coverage/M662_DA_5009_T_B00JAJC.mpileup.tsv"
+input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
+patient_id                        = "5009"
+tumor1_id                         = "B00JAJB"
+tumor2_id                         = "B00JAJC"
+input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
+input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
+input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
+input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
 
 ##
 cat("####### ARGUMENTS #######\n")
@@ -180,84 +180,47 @@ AOCounts_tumor2 = unlist(lapply(1:nrow(VCF_somatic_tumor2), function(i) get_geno
 AOCounts_tumor2_spl = strsplit(AOCounts_tumor2, ',')
 AOCounts_tumor2 = as.numeric(unlist(AOCounts_tumor2_spl)[2*(1:length(AOCounts_tumor2))-1])
 
-# Init R & X with all tumor1 position, and complete tumor2 counts
-R = data.frame(cbind(AOCounts_tumor1, rep(NA, length(AOCounts_tumor1))))
-X = data.frame(cbind(DPCounts_tumor1, rep(NA, length(DPCounts_tumor1))))
-rownames(R) = rownames(X) = VCF_somatic_tumor1$uniqID
-mpileup_tumor2 = read.table(input_mpileup_t2, sep = "\t", header=FALSE, stringsAsFactors=FALSE)
-mpileup_tumor2_uniqID <- do.call(paste, c(mpileup_tumor2[c("V1", "V2", "V3", "V4", "V5")], sep = "_")) 
-mpileup_tumor2_AO = data.frame(mpileup_tumor2$V6)
-mpileup_tumor2_DP = data.frame(mpileup_tumor2$V7)
-rownames(mpileup_tumor2_AO) = rownames(mpileup_tumor2_DP) = mpileup_tumor2_uniqID
-for (i in seq(1:nrow(mpileup_tumor2_AO))) { # for each mpileup, put count with its tumor1 equivalent
-  position_name = rownames(mpileup_tumor2_AO)[i]
-  R[position_name, 2] = mpileup_tumor2_AO[i, 1]
-  X[position_name, 2] = mpileup_tumor2_DP[i, 1]
-}
+# Load tumor1 counts with positions of tumor2
+VCF_somatic_tumor1_positions_t2 = as.data.frame(read.table(input_somatic_VCF_t1_positions_t2, sep = "\t", header=FALSE, stringsAsFactors=FALSE))
+VCF_somatic_tumor1_positions_t2_uniqID <- do.call(paste, c(VCF_somatic_tumor1_positions_t2[c("V1", "V2", "V2", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor1_positions_t2 = cbind(VCF_somatic_tumor1_positions_t2, VCF_somatic_tumor1_positions_t2_uniqID)
 
-# Keep only tumor2 positions which are not already in R (= all except the intersected ones)
-AOCounts_tumor2 = as.data.frame(AOCounts_tumor2) # all AO counts in tumor 2
-DPCounts_tumor2 = as.data.frame(DPCounts_tumor2) # all DP counts in tumor 2
-rownames(AOCounts_tumor2) = rownames(DPCounts_tumor2) = VCF_somatic_tumor2$uniqID
-colnames(DPCounts_tumor2) = colnames(DPCounts_tumor2) = c("t2")
-AOCounts_tumor2_not_in_t1 = subset(AOCounts_tumor2, ! rownames(AOCounts_tumor2) %in% rownames(R)) # all AO counts in tumor2 and not in tumor1
-DPCounts_tumor2_not_in_t1 = subset(DPCounts_tumor2, ! rownames(DPCounts_tumor2) %in% rownames(X)) # all DP counts in tumor2 and not in tumor1
-Rt2 = data.frame(cbind(rep(NA, length(AOCounts_tumor2_not_in_t1)), AOCounts_tumor2_not_in_t1))
-Xt2 = data.frame(cbind(rep(NA, length(DPCounts_tumor2_not_in_t1)), DPCounts_tumor2_not_in_t1))
-mpileup_tumor1 = read.table(input_mpileup_t1, sep = "\t", header=FALSE, stringsAsFactors=FALSE)
-mpileup_tumor1_uniqID <- do.call(paste, c(mpileup_tumor1[c("V1", "V2", "V3", "V4", "V5")], sep = "_")) 
-mpileup_tumor1_AO = data.frame(mpileup_tumor1$V6)
-##
-mpileup_tumor1_AO = subset(AOCounts_tumor2, ! rownames(AOCounts_tumor2) %in% rownames(R))
-##
-mpileup_tumor1_DP = data.frame(mpileup_tumor1$V7)
-rownames(mpileup_tumor1_AO) = mpileup_tumor1_uniqID
-for (i in seq(1:nrow(mpileup_tumor1_AO))) { # for each mpileup, put count with its tumor1 equivalent
-  position_name = rownames(mpileup_tumor1_AO)[i]
-  Rt2[position_name, 1] = mpileup_tumor1_AO[i, 1]
-  Xt2[position_name, 1] = mpileup_tumor1_DP[i, 1]
-}
+# Retrieve AO and DP counts in tumor1, with tumor2 positions
+DPCounts_positions2_in_tumor1 = unlist(lapply(1:nrow(VCF_somatic_tumor1_positions_t2), function(i) get_genotype(VCF_somatic_tumor1_positions_t2[i,10], VCF_somatic_tumor1_positions_t2[i, 9], "NR")))
+AOCounts_positions2_in_tumor1 = unlist(lapply(1:nrow(VCF_somatic_tumor1_positions_t2), function(i) get_genotype(VCF_somatic_tumor1_positions_t2[i,10], VCF_somatic_tumor1_positions_t2[i, 9], "NV")))
 
-colnames(R) = colnames(Rt2) = colnames(X) = colnames(Xt2) = c(tumor1_id, tumor2_id)
-R = rbind(R, Rt2)
-X = rbind(X, Xt2)
+# Load tumor2 counts with positions of tumor1
+VCF_somatic_tumor2_positions_t1 = as.data.frame(read.table(input_somatic_VCF_t2_positions_t1, sep = "\t", header=FALSE, stringsAsFactors=FALSE))
+VCF_somatic_tumor2_positions_t1_uniqID <- do.call(paste, c(VCF_somatic_tumor2_positions_t1[c("V1", "V2", "V2", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor2_positions_t1 = cbind(VCF_somatic_tumor2_positions_t1, VCF_somatic_tumor2_positions_t1_uniqID)
 
+# Retrieve AO and DP counts in tumor2, with tumor1 positions
+DPCounts_positions1_in_tumor2 = unlist(lapply(1:nrow(VCF_somatic_tumor2_positions_t1), function(i) get_genotype(VCF_somatic_tumor2_positions_t1[i,10], VCF_somatic_tumor2_positions_t1[i, 9], "NR")))
+AOCounts_positions1_in_tumor2 = unlist(lapply(1:nrow(VCF_somatic_tumor2_positions_t1), function(i) get_genotype(VCF_somatic_tumor2_positions_t1[i,10], VCF_somatic_tumor2_positions_t1[i, 9], "NV")))
 
+# Generate R input
+Rt1 = as.data.frame(cbind(AOCounts_tumor1, AOCounts_positions1_in_tumor2, VCF_somatic_tumor1$uniqID))
+rownames(Rt1) = VCF_somatic_tumor1$uniqID
+Rt2 = as.data.frame(cbind(AOCounts_positions2_in_tumor1, AOCounts_tumor2, VCF_somatic_tumor2$uniqID))
+rownames(Rt2) = VCF_somatic_tumor2$uniqID
+Rt2_dedup = Rt2[!(Rt2$V3 %in% Rt1$V3),] # keep only tumor2 rows which are not in t1
+colnames(Rt1) = colnames(Rt2_dedup) = c(tumor1_id, tumor2_id)
+R = rbind(Rt1, Rt2_dedup)
+R = R[,1:ncol(R)-1]
 
-
-## Remove NAs
-# R_t1 = na.omit(SNA_in$R) # nb reads supporting mutant allele
-# X_t1 = na.omit(SNA_in$X) # nb reads total
-
-
-##########################################
-## Build Y matrix (SNA over regions)
-##########################################
+Xt1 = as.data.frame(cbind(DPCounts_tumor1, DPCounts_positions1_in_tumor2, VCF_somatic_tumor1$uniqID))
+rownames(Xt1) = VCF_somatic_tumor1$uniqID
+Xt2 = as.data.frame(cbind(DPCounts_positions2_in_tumor1, DPCounts_tumor2, VCF_somatic_tumor2$uniqID))
+rownames(Xt2) = VCF_somatic_tumor2$uniqID
+Xt2_dedup = Xt2[!(Xt2$V3 %in% Xt1$V3),]
+colnames(Xt1) = colnames(Xt2_dedup) = c(tumor1_id, tumor2_id)
+X = rbind(Xt1, Xt2_dedup)
+X = X[,1:ncol(X)-1]
 
 
 
 
 
-
-
-
-
-# ##########################################
-# ## SNA input : R & X for VAF
-# ##########################################
-# VCF_somatic_content_t1 = read.table(input_somatic_VCF_t1, sep = "\t", header=FALSE, stringsAsFactors=FALSE)
-# VCF_somatic_header = c("Chr", "Start", "End", "Ref", "Alt" ,"Func.refGene", "Gene.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT", "S00716_N", "S00716_T1")
-# colnames(VCF_somatic_content_t1) = VCF_somatic_header
-# 
-# VCF_somatic_content_t1_extract_sna =  VCF_somatic_content_t1[tail(seq_along(VCF_somatic_content_t1), 11)]
-# 
-# source("/home/pgm/Workspace/MPM/marathon/libs/readVCFforCanopy.R")
-# SNA_t1 = readVCFforCanopy(VCF_somatic_content_t1_extract_sna)
-
-
-## Remove NAs
-# R_t1 = na.omit(SNA_in$R) # nb reads supporting mutant allele
-# X_t1 = na.omit(SNA_in$X) # nb reads total
 
 
 # data("MDA231")
