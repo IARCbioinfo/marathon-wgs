@@ -42,6 +42,22 @@ cat(paste("tumor1_id: ", tumor1_id, "\n", sep=''))
 cat(paste("tumor2_id: ", tumor2_id, "\n", sep=''))
 
 
+
+##########################################
+## Debug function
+##########################################
+write_matrices = function() {
+  write.table(C, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_C.tsv")
+  write.table(Y, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Y.tsv")
+  write.table(R, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_R.tsv")
+  write.table(X, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_X.tsv")
+  write.table(WM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_WM.tsv")
+  write.table(Wm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Wm.tsv")
+  write.table(epsM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsM.tsv")
+  write.table(epsm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsm.tsv")
+}
+
+
 ##########################################
 ## Prepare CNAs input for canopy
 ##########################################
@@ -208,6 +224,9 @@ Rt2_dedup = Rt2[!(Rt2$V3 %in% Rt1$V3),] # keep only tumor2 rows which are not in
 colnames(Rt1) = colnames(Rt2_dedup) = c(tumor1_id, tumor2_id)
 R = rbind(Rt1, Rt2_dedup)
 R = R[,1:ncol(R)-1]
+for (i in 1:ncol(R)) {
+  R[, i] = as.numeric(as.character(R[, i]))
+}
 
 Xt1 = as.data.frame(cbind(DPCounts_tumor1, DPCounts_positions1_in_tumor2, VCF_somatic_tumor1$uniqID))
 rownames(Xt1) = VCF_somatic_tumor1$uniqID
@@ -217,6 +236,9 @@ Xt2_dedup = Xt2[!(Xt2$V3 %in% Xt1$V3),]
 colnames(Xt1) = colnames(Xt2_dedup) = c(tumor1_id, tumor2_id)
 X = rbind(Xt1, Xt2_dedup)
 X = X[,1:ncol(X)-1]
+for (i in 1:ncol(X)) {
+  X[, i] = as.numeric(as.character(X[, i]))
+}
 
 # Generate Y input
 Y_column_names = rownames(C)
@@ -250,8 +272,59 @@ colnames(Y)[1] = "non-cna_region"
 Y[rowSums(Y) == 0, 1] = 1
 
 
+
+
 ##########################################
-## Process Canopy
+##########################################
+##                                      ##
+##          Process Canopy              ##
+##                                      ##
+##########################################
 ##########################################
 
+
+
+##########################################
+## Binomial pre-clustering of SNAs
+##########################################
+
+# A multivariate binomial mixture clustering step can be applied to the SNAs before MCMC 
+# sampling. We show in our paper via simulations that this pre-clustering method helps 
+# the Markov chain converge faster with smaller estimation error (especially when mutations 
+# show clear cluster patterns by visualization). This clustering step can also remove likely 
+# false positives before feeding the mutations to the MCMC algorithm.
+
+num_cluster = 2:9 # Range of number of clusters to run
+num_run = 10 # How many EM runs per clustering step for each mutation cluster wave
+canopy.cluster = canopy.cluster(R = data.matrix(R),
+                                X = data.matrix(X),
+                                num_cluster = num_cluster,
+                                num_run = num_run)
+
+bic_output  = canopy.cluster$bic_output # BIC for model selection (# of clusters)
+Mu          = canopy.cluster$Mu # VAF centroid for each cluster
+Tau         = canopy.cluster$Tau  # Prior for mutation cluster, with a K+1 component
+sna_cluster = canopy.cluster$sna_cluster # cluster identity for each mutation
+
+
+##########################################
+## Binomial pre-clustering of SNAs
+##########################################
+
+# This function is for cases where SNAs are pre-clustered by the Binomial mixture EM algorithm
+K = 3:9 # number of subclones
+numchain = 10 # number of chains with random initiations
+source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.sample.cluster.R")
+canopy.sample.cluster = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
+                                                     sna_cluster, 
+                                                     as.matrix(WM), as.matrix(Wm), 
+                                                     as.matrix(epsM), as.matrix(epsm), 
+                                                     C=as.matrix(C),
+                                                     Y=as.matrix(Y), 
+                                                     K, 
+                                                     max.simrun = 50000, min.simrun = 10000, numchain = numchain,
+                                                     writeskip = 200, 
+                                                     projectname = "/home/pgm/Workspace/MPM/marathon/canopy/debug.5009", 
+                                                     cell.line = TRUE, 
+                                                     plot.likelihood = TRUE)
 
