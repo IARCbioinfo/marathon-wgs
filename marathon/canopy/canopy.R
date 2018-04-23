@@ -23,16 +23,20 @@ input_somatic_VCF_t1              = args[5]
 input_somatic_VCF_t2              = args[6]
 input_somatic_VCF_t1_positions_t2 = args[7]
 input_somatic_VCF_t2_positions_t1 = args[8]
+output_path                       = args[9]
+K                                 = args[10]
 
 ##
-input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
-patient_id                        = "5009"
-tumor1_id                         = "B00JAJB"
-tumor2_id                         = "B00JAJC"
-input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
-input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
-input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
-input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
+# input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
+# patient_id                        = "5009"
+# tumor1_id                         = "B00JAJB"
+# tumor2_id                         = "B00JAJC"
+# input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
+# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
+# input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
+# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
+# output_path                       = paste("/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/", patient_id, ".K", 3, sep='')
+# K                                 = 3
 
 ##
 cat("####### ARGUMENTS #######\n")
@@ -40,6 +44,7 @@ cat(paste("input_folder: ", input_folder, "\n", sep=''))
 cat(paste("patient_id: ", patient_id, "\n", sep=''))
 cat(paste("tumor1_id: ", tumor1_id, "\n", sep=''))
 cat(paste("tumor2_id: ", tumor2_id, "\n", sep=''))
+cat(paste("K (nb subclones): ", K, "\n", sep=''))
 
 
 
@@ -294,11 +299,11 @@ Y[rowSums(Y) == 0, 1] = 1
 # show clear cluster patterns by visualization). This clustering step can also remove likely 
 # false positives before feeding the mutations to the MCMC algorithm.
 
-num_cluster = 2:9 # Range of number of clusters to run
+K=K:K # Range of number of clusters to run
 num_run = 10 # How many EM runs per clustering step for each mutation cluster wave
 canopy.cluster = canopy.cluster(R = data.matrix(R),
                                 X = data.matrix(X),
-                                num_cluster = num_cluster,
+                                num_cluster = K,
                                 num_run = num_run)
 
 bic_output  = canopy.cluster$bic_output # BIC for model selection (# of clusters)
@@ -308,23 +313,69 @@ sna_cluster = canopy.cluster$sna_cluster # cluster identity for each mutation
 
 
 ##########################################
-## Binomial pre-clustering of SNAs
+## MCMC sampling
 ##########################################
 
+# Canopy samples in subtree space with varying number of subclones(denoted as K) by a 
+# Markov chain Monte Carlo (MCMC) method. A plot of posterior likelihood (pdf format) 
+# will be generated for each subtree space and we recommend users to refer to the plot 
+# as a sanity check for sampling convergence and to choose the number of burn-ins and 
+# thinning accordingly. Note that this step can be time-consuming, especially with 
+# larger number of chains numchain specifies the number of chains with random initiations, 
+# a larger value of which is in favor of not getting stuck in local optima) and longer 
+# chains (simrun specifies number of iterations per chain). MCMC sampling is the most 
+# computationally heavy step in Canopy. It is recommended that jobs are run in parallel 
+# on high-performance cluster.
+
+
+#      /!\
+#      Missing eps values are replaced here to make it work
+#      but should be calculated
+epsM[epsM == 0.000] = 0.0001
+epsm[epsm == 0.000] = 0.0001
+#      Remove it when fixed !
+
+
 # This function is for cases where SNAs are pre-clustered by the Binomial mixture EM algorithm
-K = 3:9 # number of subclones
-numchain = 10 # number of chains with random initiations
+numchain     = 10 # number of chains with random initiations
+max.simrun   = 50000
+min.simrun   = 10000
+writeskip    = 200
+
+# numchain     = 2 # number of chains with random initiations
+# max.simrun   = 10
+# min.simrun   = 2
+# writeskip    = 4
+
 source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.sample.cluster.R")
-canopy.sample.cluster = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
+sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
                                                      sna_cluster, 
                                                      as.matrix(WM), as.matrix(Wm), 
                                                      as.matrix(epsM), as.matrix(epsm), 
                                                      C=as.matrix(C),
                                                      Y=as.matrix(Y), 
                                                      K, 
-                                                     max.simrun = 50000, min.simrun = 10000, numchain = numchain,
-                                                     writeskip = 200, 
-                                                     projectname = "/home/pgm/Workspace/MPM/marathon/canopy/debug.5009", 
+                                                     max.simrun = max.simrun, min.simrun = min.simrun, numchain = numchain,
+                                                     writeskip = writeskip, 
+                                                     projectname = output_path, 
                                                      cell.line = TRUE, 
                                                      plot.likelihood = TRUE)
+save.image(file = paste(output_path, '.postmcmc_image.rda', sep=''), compress = 'xz')
+
+
+##########################################
+## BIC for model selection
+##########################################
+
+# Canopy uses BIC as a model selection criterion to determine to optimal number of subclones.
+
+burnin = 100
+thin = 5 # If there is error in the bic and canopy.post step below, make sure
+# burnin and thinning parameters are wisely selected so that there are
+# posterior trees left.
+bic = canopy.BIC(sampchain = sampchain, projectname = projectname, K = K,
+                 numchain = numchain, burnin = burnin, thin = thin, pdf = TRUE)
+
+
+
 
