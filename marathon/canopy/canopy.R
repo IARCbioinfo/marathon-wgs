@@ -299,7 +299,7 @@ Y[rowSums(Y) == 0, 1] = 1
 # show clear cluster patterns by visualization). This clustering step can also remove likely 
 # false positives before feeding the mutations to the MCMC algorithm.
 
-K=K:K # Range of number of clusters to run
+K = K:K # Range of number of clusters to run
 num_run = 10 # How many EM runs per clustering step for each mutation cluster wave
 canopy.cluster = canopy.cluster(R = data.matrix(R),
                                 X = data.matrix(X),
@@ -342,11 +342,6 @@ max.simrun   = 50000
 min.simrun   = 10000
 writeskip    = 200
 
-# numchain     = 2 # number of chains with random initiations
-# max.simrun   = 10
-# min.simrun   = 2
-# writeskip    = 4
-
 source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.sample.cluster.R")
 sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
                                                      sna_cluster, 
@@ -366,15 +361,20 @@ save.image(file = paste(output_path, '.postmcmc_image.rda', sep=''), compress = 
 ##########################################
 ## BIC for model selection
 ##########################################
-
+# load(file = "/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/5009.K5.postmcmc_image.rda")
 # Canopy uses BIC as a model selection criterion to determine to optimal number of subclones.
 
-burnin = 100
+# burnin: initial fraction of the MCMC samples to be discarded as burn-in. Must be a value in [0, 1).
+# thin positive integer. If thin = n, only every n-th realizations of the Markov chain is kept.
+
+burnin = 90
 thin = 5 # If there is error in the bic and canopy.post step below, make sure
 # burnin and thinning parameters are wisely selected so that there are
 # posterior trees left.
-bic = canopy.BIC(sampchain = sampchain, projectname = projectname, K = K,
+
+bic = canopy.BIC(sampchain = sampchain, projectname = output_path, K = K,
                  numchain = numchain, burnin = burnin, thin = thin, pdf = TRUE)
+write.table(bic, file = paste(output_path, '.BIC', sep=""))
 
 
 
