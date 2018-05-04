@@ -1,5 +1,7 @@
-falcon.output = function(readMatrix, tauhat, cn, st_bp, end_bp, nboot=NULL){
+falcon.output = function(readMatrix, tauhat, cn, st_bp, end_bp, nboot=NULL, ascn_to_1=0){
+  
   if(is.null(nboot)){nboot = 10000}
+  if(ascn_to_1 == 1){cn$ascn[,] = 1}
   
   st_snp=c(1,tauhat)
   end_snp=c(tauhat,nrow(readMatrix))
@@ -63,3 +65,7 @@ falcon.output = function(readMatrix, tauhat, cn, st_bp, end_bp, nboot=NULL){
   }
   return(output)
 }
+
+# sd = function (x, na.rm = FALSE) 
+#   sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), na.rm = na.rm))
+
