@@ -32,9 +32,9 @@ K                                 = args[10]
 # tumor1_id                         = "B00JAJB"
 # tumor2_id                         = "B00JAJC"
 # input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
-# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAKD.normalized.vcf_multianno.hg38_multianno.txt"
+# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
 # input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
-# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAKD.other_tumor_positions.vcf"
+# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
 # output_path                       = paste("/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/", patient_id, ".K", 3, sep='')
 # K                                 = 3
 
@@ -51,16 +51,16 @@ cat(paste("K (nb subclones): ", K, "\n", sep=''))
 ##########################################
 ## Debug function
 ##########################################
-write_matrices = function() {
-  write.table(C, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_C.tsv")
-  write.table(Y, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Y.tsv")
-  write.table(R, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_R.tsv")
-  write.table(X, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_X.tsv")
-  write.table(WM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_WM.tsv")
-  write.table(Wm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Wm.tsv")
-  write.table(epsM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsM.tsv")
-  write.table(epsm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsm.tsv")
-}
+# write_matrices = function() {
+#   write.table(C, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_C.tsv")
+#   write.table(Y, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Y.tsv")
+#   write.table(R, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_R.tsv")
+#   write.table(X, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_X.tsv")
+#   write.table(WM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_WM.tsv")
+#   write.table(Wm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Wm.tsv")
+#   write.table(epsM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsM.tsv")
+#   write.table(epsm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsm.tsv")
+# }
 
 
 ##########################################
@@ -336,17 +336,35 @@ Y[rowSums(Y) == 0, 1] = 1
 # show clear cluster patterns by visualization). This clustering step can also remove likely 
 # false positives before feeding the mutations to the MCMC algorithm.
 
-K = K:K # Range of number of clusters to run
+if(K==2) Kclusters = 2:3 # Range of number of clusters to run
+if(K==3) Kclusters = 2:5 # Range of number of clusters to run
+if(K==4) Kclusters = 2:7 # Range of number of clusters to run
+if(K>=5) Kclusters = 2:10 # Range of number of clusters to run
 num_run = 10 # How many EM runs per clustering step for each mutation cluster wave
 canopy.cluster = canopy.cluster(R = data.matrix(R),
                                 X = data.matrix(X),
-                                num_cluster = K,
+                                num_cluster = Kclusters,
                                 num_run = num_run)
 
 bic_output  = canopy.cluster$bic_output # BIC for model selection (# of clusters)
 Mu          = canopy.cluster$Mu # VAF centroid for each cluster
 Tau         = canopy.cluster$Tau  # Prior for mutation cluster, with a K+1 component
 sna_cluster = canopy.cluster$sna_cluster # cluster identity for each mutation
+
+# Plot BIC values
+BIC = data.frame(as.numeric(bic_output))
+BIC = cbind(Kclusters, BIC)
+rownames(BIC) = Kclusters
+colnames(BIC) = c("Kclust", "BIC")
+optimalBIC = BIC[which.max(BIC$BIC), ]
+
+svg(filename=paste(output_path, ".optimal_cluster_number.svg", sep=''))
+plot(BIC, xlab="Kclust (nb clusters)", xaxt="n", main="Optimal number of SNAs clusters")
+lines(BIC)
+abline(v = optimalBIC$Kclust, col="red")
+axis(side=1, at=Kclusters, labels=Kclusters)
+legend("bottomleft", c(paste("optimal Kclust = ", optimalBIC$Kclust, sep='')), col=c(rgb(1,0,0,1)), lty=1:2, cex=0.8, box.lty=0)
+dev.off() # close the device
 
 
 ##########################################
@@ -367,23 +385,24 @@ sna_cluster = canopy.cluster$sna_cluster # cluster identity for each mutation
 
 # This function is for cases where SNAs are pre-clustered by the Binomial mixture EM algorithm
 numchain     = 10 # number of chains with random initiations
-max.simrun   = 50000
-min.simrun   = 10000
-writeskip    = 200
+max.simrun   = 50000 # to increase later
+min.simrun   = 10000 # to increase later
+writeskip    = 1
+K = K:K
 
 source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.sample.cluster.R")
 sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
-                                                     sna_cluster, 
-                                                     as.matrix(WM), as.matrix(Wm), 
-                                                     as.matrix(epsM), as.matrix(epsm), 
-                                                     C=as.matrix(C),
-                                                     Y=as.matrix(Y), 
-                                                     K, 
-                                                     max.simrun = max.simrun, min.simrun = min.simrun, numchain = numchain,
-                                                     writeskip = writeskip, 
-                                                     projectname = output_path, 
-                                                     cell.line = TRUE, 
-                                                     plot.likelihood = TRUE)
+                                         sna_cluster, 
+                                         as.matrix(WM), as.matrix(Wm), 
+                                         as.matrix(epsM), as.matrix(epsm), 
+                                         C=as.matrix(C),
+                                         Y=as.matrix(Y), 
+                                         K, 
+                                         max.simrun = max.simrun, min.simrun = min.simrun, numchain = numchain,
+                                         writeskip = writeskip, 
+                                         projectname = output_path, 
+                                         cell.line = TRUE, 
+                                         plot.likelihood = TRUE)
 save.image(file = paste(output_path, '.postmcmc_image.rda', sep=''), compress = 'xz')
 
 
