@@ -32,9 +32,9 @@ K                                 = args[10]
 # tumor1_id                         = "B00JAJB"
 # tumor2_id                         = "B00JAJC"
 # input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
-# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
+# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAKD.normalized.vcf_multianno.hg38_multianno.txt"
 # input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
-# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
+# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAKD.other_tumor_positions.vcf"
 # output_path                       = paste("/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/", patient_id, ".K", 3, sep='')
 # K                                 = 3
 
@@ -175,11 +175,48 @@ Wm = matrices[[2]]
 epsM = matrices[[3]]
 epsm = matrices[[4]]
 
-# All NAs copy numbers are 1 & standard deviations are 0
-WM[is.na(WM)] = 1
+# Complete missing W & eps with other tumor data recomputed
+WM[is.na(WM)] = 1 # not found copy numbers are 1
 Wm[is.na(Wm)] = 1
-epsM[is.na(epsM)] = 0
-epsm[is.na(epsm)] = 0
+
+for (i in 1:nrow(epsM)) {
+  
+  ascn_coord = rownames(epsM[i,])[1]
+  ascn_coord_spl = unlist(strsplit(ascn_coord, ':'))
+  ascn_coord_chr = sub("chr", "", ascn_coord_spl[1])
+  ascn_coord_spl = unlist(strsplit(ascn_coord_spl[2], '-'))
+  ascn_coord_start_bp = ascn_coord_spl[1]
+  ascn_coord_end_bp = ascn_coord_spl[2]
+  
+  if (is.na(epsM[i,1])) { # primary is NA
+    input_folder_chr = paste(input_folder, "chr", ascn_coord_chr, "/", sep="")
+    ascn_complementary_file = paste("falcon.patient_", patient_id, ".tumor_", tumor1_id, ".chr_", ascn_coord_chr, ".output_epsilon.txt", sep="")
+    ascn_complementary_chr = data.frame(read.table(paste(input_folder_chr, ascn_complementary_file, sep=""), sep="\t", header=TRUE, stringsAsFactors=FALSE))
+    ascn_complementary_row = ascn_complementary_chr[which(ascn_complementary_chr$chr == ascn_coord_chr & ascn_complementary_chr$st_bp == ascn_coord_start_bp),]
+    if (nrow(ascn_complementary_row) == 0) { ascn_complementary_row = ascn_complementary_chr[which(ascn_complementary_chr$chr == ascn_coord_chr & ascn_coord_start_bp >= ascn_complementary_chr$st_bp & ascn_coord_start_bp <= ascn_complementary_chr$end_bp),] }
+    if (nrow(ascn_complementary_row) == 1) {
+      epsM[i,1] = ascn_complementary_row$Major.sd
+      epsm[i,1] = ascn_complementary_row$Minor.sd
+    }
+  }
+  
+  # this code duplication is a shame...
+  if (is.na(epsM[i,2])) { # relapse is NA
+    input_folder_chr = paste(input_folder, "chr", ascn_coord_chr, "/", sep="")
+    ascn_complementary_file = paste("falcon.patient_", patient_id, ".tumor_", tumor2_id, ".chr_", ascn_coord_chr, ".output_epsilon.txt", sep="")
+    ascn_complementary_chr = data.frame(read.table(paste(input_folder_chr, ascn_complementary_file, sep=""), sep="\t", header=TRUE, stringsAsFactors=FALSE))
+    ascn_complementary_row = ascn_complementary_chr[which(ascn_complementary_chr$chr == ascn_coord_chr & ascn_complementary_chr$st_bp == ascn_coord_start_bp),]
+    if (nrow(ascn_complementary_row) == 0) { ascn_complementary_row = ascn_complementary_chr[which(ascn_complementary_chr$chr == ascn_coord_chr & ascn_coord_start_bp >= ascn_complementary_chr$st_bp & ascn_coord_start_bp <= ascn_complementary_chr$end_bp),] }
+    if (nrow(ascn_complementary_row) == 1) {
+      epsM[i,2] = ascn_complementary_row$Major.sd
+      epsm[i,2] = ascn_complementary_row$Minor.sd
+    }
+  }
+}
+
+# Just for security, but normally no NA at this step
+epsM[is.na(epsM)] = 0.001 # not found standard deviations are 0.001
+epsm[is.na(epsm)] = 0.001
 
 
 ##########################################
@@ -326,14 +363,6 @@ sna_cluster = canopy.cluster$sna_cluster # cluster identity for each mutation
 # chains (simrun specifies number of iterations per chain). MCMC sampling is the most 
 # computationally heavy step in Canopy. It is recommended that jobs are run in parallel 
 # on high-performance cluster.
-
-
-#      /!\
-#      Missing eps values are replaced here to make it work
-#      but should be calculated
-epsM[epsM == 0.000] = 0.0001
-epsm[epsm == 0.000] = 0.0001
-#      Remove it when fixed !
 
 
 # This function is for cases where SNAs are pre-clustered by the Binomial mixture EM algorithm
