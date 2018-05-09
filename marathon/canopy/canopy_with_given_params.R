@@ -21,6 +21,8 @@ input_somatic_VCF_t1_positions_t2 = args[7]
 input_somatic_VCF_t2_positions_t1 = args[8]
 output_path                       = args[9]
 K                                 = args[10]
+param_writeskip                   = as.numeric(args[11])
+param_thin                        = as.numeric(args[12])
 
 ##
 # input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
@@ -385,7 +387,7 @@ dev.off() # close the device
 numchain     = 10 # number of chains with random initiations
 max.simrun   = 50000 # to increase later
 min.simrun   = 10000 # to increase later
-writeskip    = 100
+writeskip    = param_writeskip
 K = K:K
 
 source("/data/soudadel/MPM/canopy/scripts/custom_canopy.sample.cluster.R")
@@ -415,7 +417,7 @@ save.image(file = paste(output_path, '.postmcmc_image.rda', sep=''), compress = 
 # thin positive integer. If thin = n, only every n-th realizations of the Markov chain is kept.
 
 burnin = 90
-thin = 1 # If there is error in the bic and canopy.post step below, make sure
+thin = param_thin # If there is error in the bic and canopy.post step below, make sure
 # burnin and thinning parameters are wisely selected so that there are
 # posterior trees left.
 

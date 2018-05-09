@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
 library("Canopy")
-source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.plottree.R")
+# source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.plottree.R")
+source("/data/soudadel/MPM/canopy/scripts/custom_canopy.plottree.R")
 
 ##########################################
 ## Retrieve arguments
@@ -63,7 +64,7 @@ dev.off() # close the device
 # Canopy then runs a posterior evaluation of all sampled trees by MCMC. 
 # If modes of posterior probabilities (second column of config.summary) aren’t obvious, 
 # check if the algorithm has converged (and run sampling longer if not).
-load(file = paste(data_path, "5009.K", optimalBIC$K, ".postmcmc_image.rda", sep=''))
+load(file = paste(data_path, patient_id, ".K", optimalBIC$K, ".postmcmc_image.rda", sep=''))
 post = canopy.post(sampchain = sampchain, 
                    projectname = data_path, 
                    K = 1,
