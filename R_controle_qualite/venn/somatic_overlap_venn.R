@@ -17,8 +17,8 @@ tumor2_name = args[2]
 # tumor1_name = "M662_DA_19392_T_B00JAKP"
 # tumor2_name = "M662_DA_19392_T_B00JAKQ"
 # 
-# tumor1_name = "M662_DA_5009_T_B00JAJB"
-# tumor2_name = "M662_DA_5009_T_B00JAJC"
+# tumor1_name = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB"
+# tumor2_name = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC"
 # 
 # tumor1_name = "M662_DA_6063_T_B00JAJE"
 # tumor2_name = "M662_DA_6063_T_B00JAJF"

@@ -11,16 +11,16 @@ args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
 ##
-input_folder                      = args[1]
-patient_id                        = args[2]
-tumor1_id                         = args[3]
-tumor2_id                         = args[4]
-input_somatic_VCF_t1              = args[5]
-input_somatic_VCF_t2              = args[6]
-input_somatic_VCF_t1_positions_t2 = args[7]
-input_somatic_VCF_t2_positions_t1 = args[8]
-output_path                       = args[9]
-K                                 = args[10]
+# input_folder                      = args[1]
+# patient_id                        = args[2]
+# tumor1_id                         = args[3]
+# tumor2_id                         = args[4]
+# input_somatic_VCF_t1              = args[5]
+# input_somatic_VCF_t2              = args[6]
+# input_somatic_VCF_t1_positions_t2 = args[7]
+# input_somatic_VCF_t2_positions_t1 = args[8]
+# output_path                       = args[9]
+# K                                 = args[10]
 
 ##
 # input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
@@ -213,7 +213,7 @@ for (i in 1:nrow(epsM)) {
 }
 
 # Just for security, but normally no NA at this step
-epsM[is.na(epsM)] = 0.001 # not found standard deviations are 0.001
+epsM[is.na(epsM)] = 0.001
 epsm[is.na(epsm)] = 0.001
 
 
