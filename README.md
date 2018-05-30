@@ -2,7 +2,7 @@
 
 ## Description
 
-A pipeline to study intratumor heterogeneity (ITH) with Canopy^^[1]^^.
+A pipeline to study intratumor heterogeneity (ITH) with Canopy<sup>[1]</sup>.
 
 ## References
 
