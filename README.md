@@ -44,8 +44,8 @@ To generate four different charts :
 </thead>
 <tbody>
 <tr>
-  <td>![alt text](https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_germline_AF.png "Germline AF distribution")</td>
-  <td>![alt text](https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_Venn.png "Somatic Venn")</td>
+  <td><img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_germline_AF.png" /></td>
+  <td><img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_Venn.png" /></td>
 </tr>
 </tbody>
 <thead>
@@ -56,8 +56,8 @@ To generate four different charts :
 </thead>
 <tbody>
 <tr>
-  <td>![alt text](https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_tumors_overlap.png "Somatic AF distributions and overlap")</td>
-  <td>![alt text](https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_tumors_normal_overlap.png "Somatic / Germline overlap")</td>
+  <td><img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_tumors_overlap.png" /></td>
+  <td><img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/Calling_quality_control_tumors_normal_overlap.png" /></td>
 </tr>
 </tbody>
 </table>
