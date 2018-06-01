@@ -20,3 +20,5 @@ marathon/canopy/demo
 marathon/canopy/input_C_a_valider
 marathon/falcon/demo
 marathon/falcon/output
+
+!images/*
