@@ -7,7 +7,6 @@ setwd("/home/pgm/Workspace/MPM/VCF_finaux/germline_sandbox")
 args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
-# sample_name = 'M662_DA_12323_N_B00JAKE'
 sample_name = args[1]
 
 cat("Loading VCF file...")
