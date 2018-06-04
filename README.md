@@ -32,7 +32,7 @@ In this documentation, patient ID has been replaced with _##_, and tumors ID has
 * output : a normal VCF file
 * scripts : scripts_cobalt/template_platypus.sh, scripts_cobalt/launch_platypus.sh
 
-Then th VCF output file has been filtered on _PASS_ value : keep_pass.sh.
+Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
 #### Somatic calling
 
@@ -41,7 +41,7 @@ Then th VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 * output : a normal VCF file
 * scripts : scripts_cobalt/template_strelka2.sh, scripts_cobalt/launch_strelka2.sh
 
-Then th VCF output file has been filtered on _PASS_ value : keep_pass.sh.
+Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
 #### Calling quality control
 
