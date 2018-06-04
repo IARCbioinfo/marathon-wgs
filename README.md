@@ -12,7 +12,7 @@ This pipeline has been inspired from the Marathon pipeline<sup>[2]</sup> propose
 
 <img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/pipeline_overview.png" style="width:70%; display:block; margin:auto;" />
 
-## Notes
+## Note
 
 In this documentation, patient ID has been replaced with _##_, and tumors ID has been replaced with _T1_ and _T2_.
 
