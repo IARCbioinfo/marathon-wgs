@@ -101,14 +101,25 @@ The VCF can be normalized to have a format compatible with annovar.
 
 (In this pipeline, Annovar has been run on somatic VCF only)
 
-#### Tumor coverage at the other tumor positions
+#### Tumor coverage
+
+For each patient, somatic calling of tumor1 & 2 give two variant lists with their respective positions and coverage. Germline calling also gives a variant list with its own positions and coverage.        
+
+We need the coverage of these positions in the others samples. For example, we need the coverage in tumor2 at the positions of tumor1 somatic variants. Inversely, we need the coverage in tumor1 at the positions of tumor2 somatic variants.              
+
+We also need tumor1 & 2 coverage at the positions of the germline variants.                    
+
+
+<img src="https://raw.githubusercontent.com/IARCbioinfo/marathon-wgs/master/images/coverage.png" />
+
+###### Tumor coverage at the other tumor positions
 
 * tool : Platypus
 * inputs : a tumor BAM, a tumor VCF, human genome reference file, regions file
 * output : a tumor VCF file
 * script : scripts_cobalt/calling_somatic_genotype/platypus_reads_*.sh
 
-#### Tumor coverage at the germline positions
+###### Tumor coverage at the germline positions
 
 * tool : Platypus
 * inputs : a tumor BAM, a normal VCF, human genome reference file, regions file
