@@ -15,10 +15,6 @@ patient_id = args[1]
 data_path  = args[2]
 
 ##
-# patient_id = "5009"
-# data_path  = "/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/"
-
-##
 cat("####### ARGUMENTS #######\n")
 cat(paste("patient_id: ", patient_id, "\n", sep=''))
 cat(paste("output_path: ", data_path, "\n", sep=''))
@@ -61,18 +57,18 @@ dev.off() # close the device
 ##########################################
 ## Posterior evaluation of sampled trees, output, and plotting
 ##########################################
-# Canopy then runs a posterior evaluation of all sampled trees by MCMC. 
-# If modes of posterior probabilities (second column of config.summary) aren’t obvious, 
+# Canopy then runs a posterior evaluation of all sampled trees by MCMC.
+# If modes of posterior probabilities (second column of config.summary) aren’t obvious,
 # check if the algorithm has converged (and run sampling longer if not).
 load(file = paste(data_path, patient_id, ".K", optimalBIC$K, ".postmcmc_image.rda", sep=''))
-post = canopy.post(sampchain = sampchain, 
-                   projectname = data_path, 
+post = canopy.post(sampchain = sampchain,
+                   projectname = data_path,
                    K = 1,
-                   numchain = numchain, 
-                   burnin = 90, 
-                   thin = 5, 
+                   numchain = numchain,
+                   burnin = 90,
+                   thin = 5,
                    optK = 1, # because of parallelization, it's always [[1]]
-                   C = C, 
+                   C = C,
                    post.config.cutoff = 0.05)
 
 samptreethin     = post[[1]] # list of all post-burnin and thinning trees
@@ -88,12 +84,12 @@ print(config.summary)
 ##########################################
 ## Tree
 ##########################################
-# One can then use Canopy to output and plot the most likely tree (i.e.,tree with 
-# the highest posterior likelihood). Mutations, clonal frequencies, and tree topology, 
-# etc., of the tree are obtained from the posterior distributions of subtree space 
-# with trees having the same configuration. In our MDA231 example, the most likely 
-# tree is the tree with configuration 3. Note: A separate txt file can be generated 
-# (with txt=TRUE and txt.name=’*.txt’) if the figure legend of mutational profiles 
+# One can then use Canopy to output and plot the most likely tree (i.e.,tree with
+# the highest posterior likelihood). Mutations, clonal frequencies, and tree topology,
+# etc., of the tree are obtained from the posterior distributions of subtree space
+# with trees having the same configuration. In our MDA231 example, the most likely
+# tree is the tree with configuration 3. Note: A separate txt file can be generated
+# (with txt=TRUE and txt.name=’*.txt’) if the figure legend of mutational profiles
 # (texts below the phylogenetic tree) in the plot is too long to be fitted entirely.
 
 config.i = config.summary[which.max(config.summary[,3]),1]

@@ -23,18 +23,6 @@ if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 # K                                 = args[10]
 
 ##
-# input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
-# patient_id                        = "5009"
-# tumor1_id                         = "B00JAJB"
-# tumor2_id                         = "B00JAJC"
-# input_somatic_VCF_t1              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB.normalized.vcf_multianno.hg38_multianno.txt"
-# input_somatic_VCF_t2              = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC.normalized.vcf_multianno.hg38_multianno.txt"
-# input_somatic_VCF_t1_positions_t2 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJB.other_tumor_positions.vcf"
-# input_somatic_VCF_t2_positions_t1 = "/home/pgm/Workspace/MPM/scripts_colbalt/calling_somatic_genotype/output/M662_DA_5009_T_B00JAJC.other_tumor_positions.vcf"
-# output_path                       = paste("/home/pgm/Workspace/MPM/marathon/canopy/generated_clustering/5009/", patient_id, ".K", 3, sep='')
-# K                                 = 2
-
-##
 cat("####### ARGUMENTS #######\n")
 cat(paste("input_folder: ", input_folder, "\n", sep=''))
 cat(paste("patient_id: ", patient_id, "\n", sep=''))
@@ -112,12 +100,12 @@ colnames(C) = paste("CNA", seq(1:nrow(ascn_total)), sep="_")
 # process all copy numbers and fill C matrix with 1 or 0 for each copy number
 for (i in seq(1:nrow(ascn_total))) {
   copy_number = ascn_total[i, ]
-  
+
   for (j in seq(1:nrow(C))) {
     C_chr   = unlist(strsplit(rownames(C[j, ]), ":"))[1]
     C_start = as.numeric(unlist(strsplit(unlist(strsplit(rownames(C[j, ]), ":"))[2], "-"))[1])
     C_end   = as.numeric(unlist(strsplit(unlist(strsplit(rownames(C[j, ]), ":"))[2], "-"))[2])
-    
+
     if (paste("chr", copy_number$chr, sep="") == C_chr) {
       if (C_start >= as.numeric(copy_number$st_bp) && C_start < as.numeric(copy_number$end_bp)) {
         C[j, i] = 1
@@ -143,7 +131,7 @@ build_matrices = function(ascn_tumor, ascn_tumor_index, WM, Wm, epsM, epsm) {
     C_chr   = unlist(strsplit(rownames(WM[i, ]), ":"))[1]
     C_start = as.numeric(unlist(strsplit(unlist(strsplit(rownames(WM[i, ]), ":"))[2], "-"))[1])
     C_end   = as.numeric(unlist(strsplit(unlist(strsplit(rownames(WM[i, ]), ":"))[2], "-"))[2])
-    
+
     for (j in seq(1:nrow(ascn_tumor))) {
       copy_number = ascn_tumor[j, ]
       copy_number$chr = gsub("X", "23", copy_number$chr)
@@ -175,17 +163,17 @@ WM[is.na(WM)] = 1 # not found copy numbers are 1
 Wm[is.na(Wm)] = 1
 
 for (i in 1:nrow(epsM)) {
-  
+
   ascn_coord = rownames(epsM[i,])[1]
   ascn_coord_spl = unlist(strsplit(ascn_coord, ':'))
   ascn_coord_chr = sub("chr", "", ascn_coord_spl[1])
   ascn_coord_spl = unlist(strsplit(ascn_coord_spl[2], '-'))
   ascn_coord_start_bp = ascn_coord_spl[1]
   ascn_coord_end_bp = ascn_coord_spl[2]
-  
+
   if (ascn_coord_chr == "23") { ascn_coord_chr = "X" }
   if (ascn_coord_chr == "24") { ascn_coord_chr = "Y" }
-  
+
   if (is.na(epsM[i,1])) { # primary is NA
     input_folder_chr = paste(input_folder, "chr", ascn_coord_chr, "/", sep="")
     ascn_complementary_file = paste("falcon.patient_", patient_id, ".tumor_", tumor1_id, ".chr_", ascn_coord_chr, ".output_epsilon.txt", sep="")
@@ -197,7 +185,7 @@ for (i in 1:nrow(epsM)) {
       epsm[i,1] = ascn_complementary_row$Minor.sd
     }
   }
-  
+
   # this code duplication is a shame...
   if (is.na(epsM[i,2])) { # relapse is NA
     input_folder_chr = paste(input_folder, "chr", ascn_coord_chr, "/", sep="")
@@ -221,9 +209,9 @@ epsm[is.na(epsm)] = 0.001
 ## SNA input : R & X for VAF
 ##########################################
 VCF_somatic_tumor1 = read.table(input_somatic_VCF_t1, sep = "\t", header=FALSE, stringsAsFactors=FALSE)
-VCF_somatic_tumor1$uniqID <- do.call(paste, c(VCF_somatic_tumor1[c("V1", "V2", "V3", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor1$uniqID <- do.call(paste, c(VCF_somatic_tumor1[c("V1", "V2", "V3", "V4", "V5")], sep = "_"))
 VCF_somatic_tumor2 = read.table(input_somatic_VCF_t2, sep = "\t", header=FALSE, stringsAsFactors=FALSE)
-VCF_somatic_tumor2$uniqID <- do.call(paste, c(VCF_somatic_tumor2[c("V1", "V2", "V3", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor2$uniqID <- do.call(paste, c(VCF_somatic_tumor2[c("V1", "V2", "V3", "V4", "V5")], sep = "_"))
 
 # Retrieve all DP & AO counts for tumor1
 DPCounts_tumor1 = unlist(lapply(1:nrow(VCF_somatic_tumor1), function(i) get_genotype(VCF_somatic_tumor1[i,21], VCF_somatic_tumor1[i, 19], "DP")))
@@ -239,7 +227,7 @@ AOCounts_tumor2 = as.numeric(unlist(AOCounts_tumor2_spl)[2*(1:length(AOCounts_tu
 
 # Load tumor1 counts with positions of tumor2
 VCF_somatic_tumor1_positions_t2 = as.data.frame(read.table(input_somatic_VCF_t1_positions_t2, sep = "\t", header=FALSE, stringsAsFactors=FALSE))
-VCF_somatic_tumor1_positions_t2_uniqID <- do.call(paste, c(VCF_somatic_tumor1_positions_t2[c("V1", "V2", "V2", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor1_positions_t2_uniqID <- do.call(paste, c(VCF_somatic_tumor1_positions_t2[c("V1", "V2", "V2", "V4", "V5")], sep = "_"))
 VCF_somatic_tumor1_positions_t2 = cbind(VCF_somatic_tumor1_positions_t2, VCF_somatic_tumor1_positions_t2_uniqID)
 
 # Retrieve AO and DP counts in tumor1, with tumor2 positions
@@ -248,7 +236,7 @@ AOCounts_positions2_in_tumor1 = unlist(lapply(1:nrow(VCF_somatic_tumor1_position
 
 # Load tumor2 counts with positions of tumor1
 VCF_somatic_tumor2_positions_t1 = as.data.frame(read.table(input_somatic_VCF_t2_positions_t1, sep = "\t", header=FALSE, stringsAsFactors=FALSE))
-VCF_somatic_tumor2_positions_t1_uniqID <- do.call(paste, c(VCF_somatic_tumor2_positions_t1[c("V1", "V2", "V2", "V4", "V5")], sep = "_")) 
+VCF_somatic_tumor2_positions_t1_uniqID <- do.call(paste, c(VCF_somatic_tumor2_positions_t1[c("V1", "V2", "V2", "V4", "V5")], sep = "_"))
 VCF_somatic_tumor2_positions_t1 = cbind(VCF_somatic_tumor2_positions_t1, VCF_somatic_tumor2_positions_t1_uniqID)
 
 # Retrieve AO and DP counts in tumor2, with tumor1 positions
@@ -293,13 +281,13 @@ for (i in seq(1:nrow(Y))) {
   if (Ysna_chr == "chrX") { Ysna_chr = "chr23" }
   if (Ysna_chr == "chrY") { Ysna_chr = "chr24" }
   Ysna_position = as.numeric(unlist(strsplit(rownames(Y)[i], '_'))[2])
-  
+
   for (j in seq(1:ncol(Y))) {
     Ycna = unlist(strsplit(colnames(Y)[j], ':'))
     Ycna_chr   = Ycna[1]
     Ycna_start = as.numeric(unlist(strsplit(Ycna[2], "-"))[1])
     Ycna_end   = as.numeric(unlist(strsplit(Ycna[2], "-"))[2])
-    
+
     if (Ysna_chr == Ycna_chr && Ysna_position >= Ycna_start && Ysna_position <= Ycna_end) {
       Y[i, j] = 1 # [row, col]
     }
@@ -328,10 +316,10 @@ Y[rowSums(Y) == 0, 1] = 1
 ## Binomial pre-clustering of SNAs
 ##########################################
 
-# A multivariate binomial mixture clustering step can be applied to the SNAs before MCMC 
-# sampling. We show in our paper via simulations that this pre-clustering method helps 
-# the Markov chain converge faster with smaller estimation error (especially when mutations 
-# show clear cluster patterns by visualization). This clustering step can also remove likely 
+# A multivariate binomial mixture clustering step can be applied to the SNAs before MCMC
+# sampling. We show in our paper via simulations that this pre-clustering method helps
+# the Markov chain converge faster with smaller estimation error (especially when mutations
+# show clear cluster patterns by visualization). This clustering step can also remove likely
 # false positives before feeding the mutations to the MCMC algorithm.
 
 if(K==2) Kclusters = 2:3 # Range of number of clusters to run
@@ -369,15 +357,15 @@ dev.off() # close the device
 ## MCMC sampling
 ##########################################
 
-# Canopy samples in subtree space with varying number of subclones(denoted as K) by a 
-# Markov chain Monte Carlo (MCMC) method. A plot of posterior likelihood (pdf format) 
-# will be generated for each subtree space and we recommend users to refer to the plot 
-# as a sanity check for sampling convergence and to choose the number of burn-ins and 
-# thinning accordingly. Note that this step can be time-consuming, especially with 
-# larger number of chains numchain specifies the number of chains with random initiations, 
-# a larger value of which is in favor of not getting stuck in local optima) and longer 
-# chains (simrun specifies number of iterations per chain). MCMC sampling is the most 
-# computationally heavy step in Canopy. It is recommended that jobs are run in parallel 
+# Canopy samples in subtree space with varying number of subclones(denoted as K) by a
+# Markov chain Monte Carlo (MCMC) method. A plot of posterior likelihood (pdf format)
+# will be generated for each subtree space and we recommend users to refer to the plot
+# as a sanity check for sampling convergence and to choose the number of burn-ins and
+# thinning accordingly. Note that this step can be time-consuming, especially with
+# larger number of chains numchain specifies the number of chains with random initiations,
+# a larger value of which is in favor of not getting stuck in local optima) and longer
+# chains (simrun specifies number of iterations per chain). MCMC sampling is the most
+# computationally heavy step in Canopy. It is recommended that jobs are run in parallel
 # on high-performance cluster.
 
 
@@ -390,17 +378,17 @@ K = K:K
 
 source("/data/soudadel/MPM/canopy/scripts/custom_canopy.sample.cluster.R")
 # source("/home/pgm/Workspace/MPM/marathon/libs")
-sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X), 
-                                         sna_cluster, 
-                                         as.matrix(WM), as.matrix(Wm), 
-                                         as.matrix(epsM), as.matrix(epsm), 
+sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X),
+                                         sna_cluster,
+                                         as.matrix(WM), as.matrix(Wm),
+                                         as.matrix(epsM), as.matrix(epsm),
                                          C=as.matrix(C),
-                                         Y=as.matrix(Y), 
-                                         K, 
+                                         Y=as.matrix(Y),
+                                         K,
                                          max.simrun = max.simrun, min.simrun = min.simrun, numchain = numchain,
-                                         writeskip = writeskip, 
-                                         projectname = output_path, 
-                                         cell.line = TRUE, 
+                                         writeskip = writeskip,
+                                         projectname = output_path,
+                                         cell.line = TRUE,
                                          plot.likelihood = TRUE)
 save.image(file = paste(output_path, '.postmcmc_image.rda', sep=''), compress = 'xz')
 
@@ -422,7 +410,3 @@ thin = 1 # If there is error in the bic and canopy.post step below, make sure
 bic = canopy.BIC(sampchain = sampchain, projectname = output_path, K = K,
                  numchain = numchain, burnin = burnin, thin = thin, pdf = TRUE)
 write.table(bic, file = paste(output_path, '.BIC', sep=""))
-
-
-
-

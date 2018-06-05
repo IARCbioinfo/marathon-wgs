@@ -13,12 +13,6 @@ data_file_missing_epsilon = args[1]
 data_file_coordinates     = args[2]
 output_files              = args[3]
 
-## test data
-# data_file_missing_epsilon = "/home/pgm/Workspace/MPM/marathon/falcon/output/patient_5009/chr6/falcon.patient_5009.tumor_B00JAJB.chr_6.Falcon.rda"
-# data_file_coordinates     = "/home/pgm/Workspace/MPM/marathon/falcon/output/patient_5009/chr6/falcon.patient_5009.tumor_placeholder.chr_6.output.txt"
-# output_files              = "/home/pgm/Workspace/MPM/marathon/falcon/output/"
-##
-
 
 ##########################################
 ## Load falcon data
@@ -49,9 +43,9 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
   ###########################################
   # Focus on germline heterozygous variants.
   ###########################################
-  
+
   tumor_ori_filtered = tOri_to_filter_content
-  
+
   # remove variants with missing genotype
   tumor_content=tumor_content[tumor_ori_filtered[,'Match_Norm_Seq_Allele1']!=' ',]
   tumor_ori_filtered=tumor_ori_filtered[tumor_ori_filtered[,'Match_Norm_Seq_Allele1']!=' ',]
@@ -63,17 +57,17 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
   tumor_ori_filtered=tumor_ori_filtered[tumor_ori_filtered[,'TumorSeq_Allele1']!=' ',]
   tumor_content=tumor_content[tumor_ori_filtered[,'TumorSeq_Allele2']!=' ',]
   tumor_ori_filtered=tumor_ori_filtered[tumor_ori_filtered[,'TumorSeq_Allele2']!=' ',]
-  
+
   # get germline heterozygous loci (normal allele1 != normal allele2)
   tumor_content=tumor_content[(as.matrix(tumor_ori_filtered[,'Match_Norm_Seq_Allele1'])!=as.matrix(tumor_ori_filtered[,'Match_Norm_Seq_Allele2'])),]
   tumor_ori_filtered=tumor_ori_filtered[(as.matrix(tumor_ori_filtered[,'Match_Norm_Seq_Allele1'])!=as.matrix(tumor_ori_filtered[,'Match_Norm_Seq_Allele2'])),]
-  
-  
+
+
   ############################################################
   # QC procedures to remove false neg and false pos variants.
   # The thresholds can be adjusted.
   ############################################################
-  
+
   # remove indels (this can be relaxed but we think indels are harder to call than SNPs)
   indel.filter1=nchar(as.matrix(tumor_ori_filtered[,'Reference_Allele']))<=1
   indel.filter2=nchar(as.matrix(tumor_ori_filtered[,'Match_Norm_Seq_Allele1']))<=1
@@ -82,18 +76,18 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
   indel.filter5=nchar(as.matrix(tumor_ori_filtered[,'TumorSeq_Allele2']))<=1
   tumor_content=tumor_content[indel.filter1 & indel.filter2 & indel.filter3 & indel.filter4 & indel.filter5,]
   tumor_ori_filtered=tumor_ori_filtered[indel.filter1 & indel.filter2 & indel.filter3 & indel.filter4 & indel.filter5,]
-  
+
   # total number of reads greater than 30 in both tumor and normal
   depth.filter1=(tumor_ori_filtered[,"Normal_ReadCount_Ref"]+tumor_ori_filtered[,"Normal_ReadCount_Alt"])>=30
   depth.filter2=(tumor_ori_filtered[,"Tumor_ReadCount_Ref"]+tumor_ori_filtered[,"Tumor_ReadCount_Alt"])>=30
   tumor_content=tumor_content[depth.filter1 & depth.filter2,]
   tumor_ori_filtered=tumor_ori_filtered[depth.filter1 & depth.filter2,]
-  
-  
+
+
   #########################
   # Generate FALCON input.
   #########################
-  
+
   # Data frame with four columns: tumor ref, tumor alt, normal ref, normal alt.
   readMatrix.tumor_content=as.data.frame(tumor_content[,c('Tumor_ReadCount_Ref',
                                                           'Tumor_ReadCount_Alt',
@@ -101,32 +95,32 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
                                                           'Normal_ReadCount_Alt')])
   colnames(readMatrix.tumor_content)=c('AT','BT','AN','BN')
   dim(readMatrix.tumor_content); dim(tumor_content)
-  
-  
+
+
   ###############################
   # Run FALCON and view results.
   ###############################
-  
+
   if (nrow(tumor_content) > 0) {
-    
+
     for (i in seq(nrow(coordinates))) {
-      
+
       if (!is.na(coordinates[i,]$Major.sd) || !is.na(coordinates[i,]$Minor.sd)) {
         tauhat.tumor_content = c(coordinates[i,]$st_snp, coordinates[i,]$end_snp)
         source("/home/pgm/Workspace/MPM/marathon/libs/falcon.getASCN.epsilon.R")
         cn.tumor_content = falcon.getASCN.epsilon(readMatrix.tumor_content, tauhat=tauhat.tumor_content, rdep = rdep_tumor, threshold = 0.3)
-        
+
         # falcon bugfix
         if (ncol(cn.tumor_content$ascn) <= 1 ) { # if only 1 ascn found, ther is a bug, so we duplicate
           cn.tumor_content$ascn = cbind(cn.tumor_content$ascn, cn.tumor_content$ascn[,1])
           cn.tumor_content$Haplotype[[2]] = cn.tumor_content$Haplotype[[1]]
         }
-        
+
         #################################################
         # Generate Canopy's input with s.d. measurement.
         #################################################
-        
-        # This is to generate table output including genomic locations for 
+
+        # This is to generate table output including genomic locations for
         # segment boudaries.
         # For Canopy's input, we use Bootstrap-based method to estimate the
         # standard deviations for the allele-specific copy numbers.
@@ -138,17 +132,17 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
                                     end_bp = tumor_content[,"End_position"],
                                     nboot = 5000,
                                     ascn_to_1 = 1)
-        
+
         falcon.output = cbind(chr=rep(chr,nrow(falcon.output)), falcon.output)
         falcon.output[which(falcon.output == 0)] = NA
         filename = paste(output_files, "patient_", patient_id, "/chr", chr, "/falcon.patient_", patient_id, ".tumor_", sample_id, ".chr_", chr, ".output_epsilon.txt", sep='')
-        
+
         if (!file.exists(filename)) {
-          write.table(na.omit(falcon.output), file=filename, col.names =T, row.names = F, sep='\t', quote = F, append=F)  
+          write.table(na.omit(falcon.output), file=filename, col.names =T, row.names = F, sep='\t', quote = F, append=F)
         } else {
-          write.table(na.omit(falcon.output), file=filename, col.names =F, row.names = F, sep='\t', quote = F, append=T)  
+          write.table(na.omit(falcon.output), file=filename, col.names =F, row.names = F, sep='\t', quote = F, append=T)
         }
-      } 
+      }
     }
   }
 }
@@ -177,4 +171,3 @@ if (nrow(coordinates_t1)) {
 
 cat(paste("\nChromosome", chr, " DONE.\n\n", sep=""))
 cat("########################################\n\n")
-

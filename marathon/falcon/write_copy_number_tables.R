@@ -15,13 +15,6 @@ tumor2_id                         = args[4]
 output_path                       = args[5]
 
 ##
-# input_folder                      = "/home/pgm/Workspace/MPM/VCF_finaux/falcon/patient_5009/"
-# patient_id                        = "5009"
-# tumor1_id                         = "B00JAJB"
-# tumor2_id                         = "B00JAJC"
-# output_path                       = "/home/pgm/Workspace/MPM/marathon/falcon/output/"
-
-##
 cat("####### ARGUMENTS #######\n")
 cat(paste("input_folder: ", input_folder, "\n", sep=''))
 cat(paste("patient_id: ", patient_id, "\n", sep=''))
@@ -30,7 +23,7 @@ cat(paste("tumor2_id: ", tumor2_id, "\n", sep=''))
 
 
 ##########################################
-## Prepare CNAs input 
+## Prepare CNAs input
 ##########################################
 compile_ascn_tumor = function(patient_id, tumor_id) {
   chromosomes = c(seq(1:22), "X", "Y")
@@ -57,4 +50,3 @@ ascn_relapse = compile_ascn_tumor(patient_id, tumor2_id)
 ##########################################
 write.table(ascn_primary, file=paste(output_path, patient_id, '.', tumor1_id, '.CNA.tsv', sep=''), quote=F)
 write.table(ascn_relapse, file=paste(output_path, patient_id, '.', tumor2_id, '.CNA.tsv', sep=''), quote=F)
-
