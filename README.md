@@ -23,14 +23,14 @@ In this documentation, patient ID has been replaced with _##_, and tumors ID has
 * tool : BWA
 * input : a BAM file
 * output : a BAM file
-* scripts : scripts_cobalt/template_postalt.sh, scripts_cobalt/launch_postalt.sh
+* scripts : scripts_cobalt/template_postalt.sh, scripts/cobalt/launch_postalt.sh
 
 #### Germline calling
 
 * tool : Platypus
 * inputs : a normal BAM file, human genome reference file, regions file
 * output : a normal VCF file
-* scripts : scripts_cobalt/template_platypus.sh, scripts_cobalt/launch_platypus.sh
+* scripts : scripts_cobalt/template_platypus.sh, scripts/cobalt/launch_platypus.sh
 
 Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
@@ -39,7 +39,7 @@ Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 * tool : Strelka2
 * inputs : a tumor BAM file, its associated normal BAM file, human genome reference file, regions file
 * output : a normal VCF file
-* scripts : scripts_cobalt/template_strelka2.sh, scripts_cobalt/launch_strelka2.sh
+* scripts : scripts_cobalt/template_strelka2.sh, scripts/cobalt/launch_strelka2.sh
 
 Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
@@ -77,7 +77,7 @@ To generate four different charts :
 * tool : R
 * inputs : VCF files
 * outputs : SVG files
-* scripts : R_controle_qualite/*
+* scripts : R_QC/*
 
 #### VCF normalization and annotation
 
@@ -90,14 +90,14 @@ The VCF can be normalized to have a format compatible with annovar.
 * tool : vt
 * inputs : a tumor VCF file
 * output : a tumor VCF file
-* script : normalize_vcf.sh
+* script : scripts/normalize_vcf.sh
 
 ###### Annotation
 
 * tool : Annovar
 * inputs : a VCF file
 * output : a VCF file with extra columns
-* script : scripts_cobalt/run_annovar.sh
+* script : scripts/run_annovar.sh
 
 (In this pipeline, Annovar has been run on somatic VCF only)
 
@@ -117,21 +117,21 @@ We also need tumor1 & 2 coverage at the positions of the germline variants.
 * tool : Platypus
 * inputs : a tumor BAM, a tumor VCF, human genome reference file, regions file
 * output : a tumor VCF file
-* script : scripts_cobalt/calling_somatic_genotype/platypus_reads_*.sh
+* script : scripts/calling_somatic_genotype/platypus_reads_*.sh
 
 ###### Tumor coverage at the germline positions
 
 * tool : Platypus
 * inputs : a tumor BAM, a normal VCF, human genome reference file, regions file
 * output : a tumor VCF file
-* script : scripts_cobalt/calling_germline_genotype/platypus_genotype_*.sh
+* script : scripts/calling_germline_genotype/platypus_genotype_*.sh
 
 #### Somatic allele-specific copy numbers profiling
 
 ###### To get the copy numbers
 
 The script is parallelized by chromosome.  
-To split germline VCF by chromosome, use this script : split_vcf_chromosome.sh
+To split germline VCF by chromosome, use this script : scripts/split_vcf_chromosome.sh
 
 * tool : Falcon (R package)
 * inputs :
