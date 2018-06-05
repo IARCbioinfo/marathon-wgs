@@ -1,0 +1,56 @@
+May-30 15:07:30.312 [main] DEBUG nextflow.cli.Launcher - $> /usr/local/bin/nextflow run ITH_WGS.nf --input_BAM=./raw_files/bams.csv
+May-30 15:07:30.496 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 0.29.1
+May-30 15:07:30.507 [main] INFO  nextflow.cli.CmdRun - Launching `ITH_WGS.nf` [extravagant_linnaeus] - revision: 63c930b8bf
+May-30 15:07:30.603 [main] DEBUG nextflow.Session - Session uuid: 5f78cd1d-2744-4fd1-8662-d646e98cc0eb
+May-30 15:07:30.603 [main] DEBUG nextflow.Session - Run name: extravagant_linnaeus
+May-30 15:07:30.606 [main] DEBUG nextflow.Session - Executor pool size: 12
+May-30 15:07:30.620 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 0.29.1 build 4804
+  Modified: 10-05-2018 07:47 UTC (09:47 CEST)
+  System: Linux 4.13.0-39-generic
+  Runtime: Groovy 2.4.15 on Java HotSpot(TM) 64-Bit Server VM 1.8.0_171-b11
+  Encoding: UTF-8 (UTF-8)
+  Process: 44825@PGM-Server [127.0.1.1]
+  CPUs: 12 - Mem: 47.2 GB (860.7 MB) - Swap: 488 MB (412 MB)
+May-30 15:07:30.695 [main] DEBUG nextflow.Session - Work-dir: /home/pgm/Workspace/MPM/pipeline/work [ext2/ext3]
+May-30 15:07:30.827 [main] DEBUG nextflow.Session - Session start invoked
+May-30 15:07:30.836 [main] DEBUG nextflow.processor.TaskDispatcher - Dispatcher > start
+May-30 15:07:30.837 [main] DEBUG nextflow.script.ScriptRunner - > Script parsing
+May-30 15:07:31.129 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+May-30 15:07:31.365 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+May-30 15:07:31.365 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+May-30 15:07:31.373 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+May-30 15:07:31.376 [main] INFO  nextflow.executor.Executor - [warm up] executor > local
+May-30 15:07:31.381 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=12; memory=47.2 GB; capacity=12; pollInterval=100ms; dumpInterval=5m
+May-30 15:07:31.386 [main] DEBUG nextflow.processor.TaskDispatcher - Starting monitor: LocalPollingMonitor
+May-30 15:07:31.386 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+May-30 15:07:31.390 [main] DEBUG nextflow.executor.Executor - Invoke register for executor: local
+May-30 15:07:31.543 [main] DEBUG nextflow.Session - >>> barrier register (process: post_alignment)
+May-30 15:07:31.546 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > post_alignment -- maxForks: 12
+May-30 15:07:31.566 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+May-30 15:07:31.567 [main] DEBUG nextflow.Session - Session await
+May-30 15:07:31.749 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.755 [Task submitter] INFO  nextflow.Session - [fc/9fa5f5] Submitted process > post_alignment (2)
+May-30 15:07:31.774 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.775 [Task submitter] INFO  nextflow.Session - [42/de0c85] Submitted process > post_alignment (1)
+May-30 15:07:31.780 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.781 [Task submitter] INFO  nextflow.Session - [f8/e83000] Submitted process > post_alignment (4)
+May-30 15:07:31.786 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.787 [Task submitter] INFO  nextflow.Session - [30/2a1613] Submitted process > post_alignment (6)
+May-30 15:07:31.792 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: post_alignment (2); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/fc/9fa5f5d36cbfc5f56be191fb01b72f]
+May-30 15:07:31.793 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.793 [Task submitter] INFO  nextflow.Session - [1f/c61f22] Submitted process > post_alignment (3)
+May-30 15:07:31.798 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-30 15:07:31.798 [Task submitter] INFO  nextflow.Session - [e2/8f47e8] Submitted process > post_alignment (5)
+May-30 15:07:31.815 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: post_alignment (1); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/42/de0c85202bd2c6a08f5e0851b9b58c]
+May-30 15:07:31.822 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: post_alignment (4); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/f8/e830005120f302eb6e1e7836487802]
+May-30 15:07:31.826 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: post_alignment (6); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/30/2a1613d1fdede965a0a321f831fc22]
+May-30 15:07:31.831 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: post_alignment (3); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/1f/c61f22bab61f52b84d2f02987937aa]
+May-30 15:07:31.839 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: post_alignment (5); status: COMPLETED; exit: 0; error: -; workDir: /home/pgm/Workspace/MPM/pipeline/work/e2/8f47e81cb260a74945bf46399b774a]
+May-30 15:07:31.843 [Actor Thread 2] DEBUG nextflow.Session - <<< barrier arrive (process: post_alignment)
+May-30 15:07:31.844 [main] DEBUG nextflow.Session - Session await > all process finished
+May-30 15:07:31.920 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local)
+May-30 15:07:31.920 [main] DEBUG nextflow.Session - Session await > all barriers passed
+May-30 15:07:31.930 [main] DEBUG nextflow.trace.StatsObserver - Workflow completed > WorkflowStats[succeedCount=6; failedCount=0; ignoredCount=0; cachedCount=0; succeedDuration=11ms; failedDuration=0ms; cachedDuration=0ms]
+May-30 15:07:31.939 [main] DEBUG nextflow.CacheDB - Closing CacheDB done
+May-30 15:07:31.967 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
