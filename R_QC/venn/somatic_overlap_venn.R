@@ -10,26 +10,6 @@ if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 tumor1_name = args[1]
 tumor2_name = args[2]
 
-######################################################
-# tumor1_name = "M662_DA_12323_T_B00JAKC"
-# tumor2_name = "M662_DA_12323_T_B00JAKD"
-# 
-# tumor1_name = "M662_DA_19392_T_B00JAKP"
-# tumor2_name = "M662_DA_19392_T_B00JAKQ"
-# 
-# tumor1_name = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJB"
-# tumor2_name = "/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox/M662_DA_5009_T_B00JAJC"
-# 
-# tumor1_name = "M662_DA_6063_T_B00JAJE"
-# tumor2_name = "M662_DA_6063_T_B00JAJF"
-# 
-# tumor1_name = "M662_DA_8329_T_B00JAKF"
-# tumor2_name = "M662_DA_8329_T_B00JAKH"
-# 
-# tumor1_name = "M662_DA_LB110287_T_B00JAK0"
-# tumor2_name = "M662_DA_LB110287_T_B00JAK2"
-######################################################
-
 patient_id = unlist(strsplit(tumor1_name, "_"))[3]
 sample1_id = unlist(strsplit(tumor1_name, "_"))[5]
 sample2_id = unlist(strsplit(tumor2_name, "_"))[5]
@@ -46,8 +26,8 @@ generated_files = '/home/pgm/Workspace/MPM/R_controle_qualite/venn/generated_fil
 ############################################
 ## Generate unique ID and intersect
 ############################################
-tumor1_VCFcontent$uniqid <- paste(tumor1_VCFcontent$V1, tumor1_VCFcontent$V2, tumor1_VCFcontent$V4, tumor1_VCFcontent$V5, sep='_') 
-tumor2_VCFcontent$uniqid <- paste(tumor2_VCFcontent$V1, tumor2_VCFcontent$V2, tumor2_VCFcontent$V4, tumor2_VCFcontent$V5, sep='_') 
+tumor1_VCFcontent$uniqid <- paste(tumor1_VCFcontent$V1, tumor1_VCFcontent$V2, tumor1_VCFcontent$V4, tumor1_VCFcontent$V5, sep='_')
+tumor2_VCFcontent$uniqid <- paste(tumor2_VCFcontent$V1, tumor2_VCFcontent$V2, tumor2_VCFcontent$V4, tumor2_VCFcontent$V5, sep='_')
 
 inter = intersect(tumor1_VCFcontent$uniqid, tumor2_VCFcontent$uniqid)
 
@@ -66,9 +46,9 @@ dev.off() # close the device
 ############################################
 
 
-# STRELKA : An additional feature of the somatic caller is that it uses two calling tiers to reduce false positives. 
+# STRELKA : An additional feature of the somatic caller is that it uses two calling tiers to reduce false positives.
 # The first tier (tier1) is a set of input data filtration and model parameter settings with relatively
-# stringent values, whereas the second tier (tier2) uses more permissive settings. All calls are 
+# stringent values, whereas the second tier (tier2) uses more permissive settings. All calls are
 # initially  made  using  tier1  settings,  after  which  the  variant  is  called  again using tier2.
 
 # refCounts = Value of FORMAT column $REF + “U” (e.g. if REF="A" then use the value in FOMRAT/AU)

@@ -12,31 +12,6 @@ normal_name = args[1]
 tumor1_short_name = args[2]
 tumor2_short_name = args[3]
 
-######################################################
-# normal_name = "M662_DA_12323_N_B00JAKE"
-# tumor1_short_name = "M662_DA_12323_T_B00JAKC"
-# tumor2_short_name = "M662_DA_12323_T_B00JAKD"
-# 
-# normal_name = "M662_DA_19392_N_B00JAKR"
-# tumor1_short_name = "M662_DA_19392_T_B00JAKP"
-# tumor2_short_name = "M662_DA_19392_T_B00JAKQ"
-# 
-# normal_name = "M662_DA_5009_N_B00JAJD"
-# tumor1_short_name = "B00JAJB"
-# tumor2_short_name = "B00JAJC"
-# 
-# normal_name = "M662_DA_6063_N_B00JAJG"
-# tumor1_short_name = "M662_DA_6063_T_B00JAJE"
-# tumor2_short_name = "M662_DA_6063_T_B00JAJF"
-# 
-# normal_name = "M662_DA_8329_N_B00JAKG"
-# tumor1_short_name = "M662_DA_8329_T_B00JAKF"
-# tumor2_short_name = "M662_DA_8329_T_B00JAKH"
-# 
-# normal_name = "M662_DA_LB110287_N_B00JAK1"
-# tumor1_short_name = "M662_DA_LB110287_T_B00JAK0"
-# tumor2_short_name = "M662_DA_LB110287_T_B00JAK2"
-######################################################
 
 patient_id = unlist(strsplit(normal_name, "_"))[3]
 sample_normal_id = unlist(strsplit(normal_name, "_"))[5]
@@ -47,8 +22,8 @@ print(paste("> processing ", patient_id, sep=''))
 # print("> loading germline VCF... ")
 # normal_VCFcontent = read.table(normal_VCFfile, sep="\t", header=FALSE, stringsAsFactors=FALSE)
 # print("DONE.")
-# 
-# 
+#
+#
 # ############################################
 # ## Calculate allelic fractions for tumor 1 & 2
 # ############################################
@@ -57,17 +32,17 @@ print(paste("> processing ", patient_id, sep=''))
 #   DPCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,10], VCFcontent[i, 9], "NR")))
 #   altCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,10], VCFcontent[i, 9], "NV")))
 #   normal = altCounts / DPCounts
-#   
+#
 #   # 11 is tumor1
 #   DPCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,11], VCFcontent[i, 9], "NR")))
 #   altCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,11], VCFcontent[i, 9], "NV")))
 #   t1 = altCounts / DPCounts
-#   
+#
 #   # 12 is tumor2
 #   DPCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,12], VCFcontent[i, 9], "NR")))
 #   altCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFcontent[i,12], VCFcontent[i, 9], "NV")))
 #   t2 = altCounts / DPCounts
-#   
+#
 #   return(list(normal, t1, t2))
 # }
 # print("> calculating allelic fractions... ")
@@ -76,8 +51,8 @@ print(paste("> processing ", patient_id, sep=''))
 # allFracs_tumor1 = allFracs[[2]]
 # allFracs_tumor2 = allFracs[[3]]
 # print("DONE.")
-# 
-# 
+#
+#
 # ############################################
 # ## Save computed data
 # ############################################
