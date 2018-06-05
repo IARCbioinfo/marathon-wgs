@@ -23,14 +23,14 @@ In this documentation, patient ID has been replaced with _##_, and tumors ID has
 * tool : BWA
 * input : a BAM file
 * output : a BAM file
-* scripts : scripts_cobalt/template_postalt.sh, scripts/cobalt/launch_postalt.sh
+* scripts : scripts/cobalt/template_postalt.sh, scripts/cobalt/launch_postalt.sh
 
 #### Germline calling
 
 * tool : Platypus
 * inputs : a normal BAM file, human genome reference file, regions file
 * output : a normal VCF file
-* scripts : scripts_cobalt/template_platypus.sh, scripts/cobalt/launch_platypus.sh
+* scripts : scripts/cobalt/template_platypus.sh, scripts/cobalt/launch_platypus.sh
 
 Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
@@ -39,7 +39,7 @@ Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 * tool : Strelka2
 * inputs : a tumor BAM file, its associated normal BAM file, human genome reference file, regions file
 * output : a normal VCF file
-* scripts : scripts_cobalt/template_strelka2.sh, scripts/cobalt/launch_strelka2.sh
+* scripts : scripts/cobalt/template_strelka2.sh, scripts/cobalt/launch_strelka2.sh
 
 Then the VCF output file has been filtered on _PASS_ value : keep_pass.sh.
 
