@@ -1,17 +1,17 @@
 #!/usr/bin/env Rscript
-
 source("https://gist.githubusercontent.com/mfoll/a4dfbb92068dc559f130/raw/714dc8c2e97987fd4385dcef2722b3ef986d38d6/get_vcf_data.r")
-generated_files = '/home/pgm/Workspace/MPM/R_controle_qualite/germline/generated_files/'
-setwd("/home/pgm/Workspace/MPM/VCF_finaux/germline_sandbox")
 
 args = commandArgs(trailingOnly = TRUE)
-if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
+if (length(args)==0) { stop("Input missing!\n", call.=FALSE) }
 
-sample_name = args[1]
+path_to_germline_VCF     = args[1]
+path_to_output_directory = args[2]
+
+path_to_germline_VCF_spl = unlist(strsplit(path_to_germline_VCF, "/"))
+sample_name = gsub(".vcf", "", path_to_germline_VCF_spl[length(path_to_germline_VCF_spl)])
 
 cat("Loading VCF file...")
-VCFfile = paste(sample_name, '.GERMLINE.vcf', sep='')
-VCFcontent = read.table(VCFfile, sep="\t", header=FALSE, stringsAsFactors=FALSE)
+VCFcontent = read.table(path_to_germline_VCF, sep="\t", header=FALSE, stringsAsFactors=FALSE)
 cat("Loaded.")
 
 ############################################
@@ -22,7 +22,7 @@ altCounts <- unlist(lapply(1:nrow(VCFcontent), function(i) get_genotype(VCFconte
 
 allelic_fractions = altCounts / DPCounts
 
-svg(filename=paste(generated_files, sample_name, ".svg", sep=''))
+svg(filename=paste(path_to_output_directory, "/", sample_name, ".svg", sep=''))
 hist(allelic_fractions, breaks=50, main="Allelic fractions", xlim=c(0,1))
 dev.off() # close the device
 ############################################
