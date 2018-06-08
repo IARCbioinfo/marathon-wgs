@@ -1,25 +1,20 @@
 #!/usr/bin/env Rscript
 
 source("https://gist.githubusercontent.com/mfoll/a4dfbb92068dc559f130/raw/714dc8c2e97987fd4385dcef2722b3ef986d38d6/get_vcf_data.r")
-setwd("/home/pgm/Workspace/MPM/VCF_finaux/somatic_sandbox")
 
 args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
-tumor1_name = args[1]
-tumor2_name = args[2]
+path_to_tumor1_VCF       = args[1]
+path_to_tumor2_VCF       = args[2]
+path_to_output_directory = args[3]
+patient_id               = args[4]
+sample1_id               = args[5]
+sample2_id               = args[6]
 
-patient_id = unlist(strsplit(tumor1_name, "_"))[3]
-sample1_id = unlist(strsplit(tumor1_name, "_"))[5]
-sample2_id = unlist(strsplit(tumor2_name, "_"))[5]
+tumor1_VCFcontent = read.table(path_to_tumor1_VCF, sep="\t", header=FALSE, stringsAsFactors=FALSE)
+tumor2_VCFcontent = read.table(path_to_tumor2_VCF, sep="\t", header=FALSE, stringsAsFactors=FALSE)
 
-tumor1_VCFfile = paste(tumor1_name, '.normalized.vcf_multianno.hg38_multianno.txt', sep='')
-tumor2_VCFfile = paste(tumor2_name, '.normalized.vcf_multianno.hg38_multianno.txt', sep='')
-
-tumor1_VCFcontent = read.table(tumor1_VCFfile, sep="\t", header=FALSE, stringsAsFactors=FALSE)
-tumor2_VCFcontent = read.table(tumor2_VCFfile, sep="\t", header=FALSE, stringsAsFactors=FALSE)
-
-generated_files = '/home/pgm/Workspace/MPM/R_controle_qualite/intersect_2_tumors/generated_files/'
 print(paste("Generating chart for patient ", patient_id, "...", sep=""))
 
 ############################################
@@ -59,7 +54,7 @@ tumor2_inter_allfrac = calculate_allelic_fractions(inter_t2)
 ## Stacked bars with tumor 1 & 2
 ############################################
 breaks = seq(0,1,0.01)
-svg(filename=paste(generated_files, patient_id, "_", sample2_id, "_on_", sample1_id, ".svg", sep=''))
+svg(filename=paste(path_to_output_directory, "/", patient_id, "_", sample2_id, "_on_", sample1_id, ".svg", sep=''))
 
 par(family="Times",las=1)
 
