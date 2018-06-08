@@ -2,10 +2,6 @@
 
 library("falcon")
 source("https://gist.githubusercontent.com/mfoll/a4dfbb92068dc559f130/raw/714dc8c2e97987fd4385dcef2722b3ef986d38d6/get_vcf_data.r")
-# source("/home/pgm/Workspace/MPM/marathon/libs/falcon.output.R")
-# source("/home/pgm/Workspace/MPM/marathon/libs/falcon.qc.R")
-source("/home/soudadel/MPM/falcon/libs/falcon.output.R")
-source("/home/soudadel/MPM/falcon/libs/falcon.qc.R")
 
 
 ##########################################
@@ -14,28 +10,25 @@ source("/home/soudadel/MPM/falcon/libs/falcon.qc.R")
 args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
-input_file = args[1]
-tumor1_sample_id = args[2]
-tumor2_sample_id = args[3]
-chr = args[4]
-generated_files = args[5]
+path_to_normal_VCF = args[1]
+patient_id         = args[2]
+normal_sample_id   = args[3]
+tumor1_sample_id   = args[4]
+tumor2_sample_id   = args[5]
+chr                = args[6]
+path_to_output     = args[7]
+path_to_lib_output = args[8]
+path_to_lib_qc     = args[9]
 
-cat("####### ARGUMENTS #######\n")
-cat(paste("input_file: ", input_file, "\n", sep=''))
-cat(paste("tumor1_sample_id: ", tumor1_sample_id, "\n", sep=''))
-cat(paste("tumor2_sample_id: ", tumor2_sample_id, "\n", sep=''))
-cat(paste("chr: ", chr, "\n", sep=''))
-cat(paste("generated_files: ", generated_files, "\n\n", sep=''))
+
+source(path_to_lib_output)
+source(path_to_lib_qc)
+
 
 ##########################################
 ## Set parameters
 ##########################################
-file_name = unlist(strsplit(input_file, "_chromosomes/"))[2]
-
-input_name_data  = unlist(strsplit(file_name, "_"))
-input_name_data2 = unlist(strsplit(input_name_data[5], ".GERMLINE"))
-patient_id = input_name_data[3]
-normal_sample_id = input_name_data2[1]
+file_name = basename(path_to_normal_VCF)
 
 
 ##########################################
@@ -44,7 +37,7 @@ normal_sample_id = input_name_data2[1]
 ##########################################
 header = c("CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT", tumor1_sample_id, tumor2_sample_id, normal_sample_id)
 cat(paste("\nLoading germline VCF with genotypes: ", file_name, "... "))
-VCF_germline_content = read.table(input_file, sep="\t", header=FALSE, stringsAsFactors=FALSE)
+VCF_germline_content = read.table(path_to_normal_VCF, sep="\t", header=FALSE, stringsAsFactors=FALSE)
 colnames(VCF_germline_content) = header
 cat(paste("Loaded.\n"))
 
@@ -104,7 +97,7 @@ primary = buildInput(VCF_germline_content, normal_sample_id, tumor1_sample_id)
 relapse = buildInput(VCF_germline_content, normal_sample_id, tumor2_sample_id)
 
 # save image file.
-save.image(file=paste(generated_files, file_name, '.input_falcon.rda', sep=''))
+save.image(file=paste(path_to_output, "/", file_name, '.input_falcon.rda', sep=''))
 
 
 ##########################################
@@ -173,7 +166,7 @@ process_chromosome = function(tumor_content, chr, patient_id, sample_id, rdep_tu
     cn.tumor_content = getASCN(readMatrix.tumor_content, tauhat=tauhat.tumor_content, rdep = rdep_tumor, threshold = 0.3)
 
     # Chromosomal view of segmentation results.
-    filename = paste(generated_files, 'falcon.patient_', patient_id, '.tumor_', sample_id, '.chr_',chr,sep='')
+    filename = paste(path_to_output, "/", 'falcon.patient_', patient_id, '.tumor_', sample_id, '.chr_',chr,sep='')
     pdf(file=paste(filename,'.pdf',sep=''), width=5, height=8)
     view(cn.tumor_content,pos=tumor_content[,'Start_position'], rdep = rdep_tumor)
     dev.off()

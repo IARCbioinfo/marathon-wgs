@@ -135,11 +135,15 @@ To split germline VCF by chromosome, use this script : scripts/split_vcf_chromos
 
 * tool : Falcon (R package)
 * inputs :
-  * args[1] = germline VCF file
-  * args[2] = tumor1 sample ID
-  * args[3] = tumor2 sample ID
-  * args[4] = chromosome
-  * args[5] = path to output directory
+  * args[1] = path_to_normal_VCF
+  * args[2] = patient_id
+  * args[3] = normal_sample_id
+  * args[4] = tumor1_sample_id
+  * args[5] = tumor2_sample_id
+  * args[6] = chr
+  * args[7] = path_to_output
+  * args[8] = path_to_lib_output
+  * args[9] = path_to_lib_qc
 * outputs :
   * a PDF with segmentation results
   * a PDF with QC
@@ -148,6 +152,11 @@ To split germline VCF by chromosome, use this script : scripts/split_vcf_chromos
   * a RDA with tumor1 copy number computed
   * a RDA with tumor2 copy number computed
 * script : marathon/falcon/falcon.R
+* example :
+
+```
+Rscript falcon.R /home/pgm/Workspace/MPM_bck/VCF_finaux/germline_sandbox/M662_DA_5009_N_B00JAJD_chromosomes/M662_DA_5009_N_B00JAJD.GERMLINE.chrY.vcf 5009 B00JAJD B00JAJB B00JAJC Y /home/pgm/Workspace/MPM_bck/VCF_finaux/tests /home/pgm/Workspace/MPM_bck/marathon/libs/falcon.output.R /home/pgm/Workspace/MPM_bck/marathon/libs/falcon.qc.R
+```
 
 ###### To get the copy numbers, in the other tumor regions with variations
 
@@ -240,5 +249,5 @@ http://www.pnas.org/content/pnas/113/37/E5528.full.pdf
 
 [2] **Integrative pipeline for profiling DNA copy number and inferring tumor phylogeny**  
 Eugene Urrutia Hao Chen Zilu Zhou Nancy R Zhang Yuchao Jiang  
-Bioinformatics, bty057 (2018)
+Bioinformatics, bty057 (2018)  
 https://academic.oup.com/bioinformatics/advance-article-abstract/doi/10.1093/bioinformatics/bty057/4838234?redirectedFrom=fulltext
