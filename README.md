@@ -155,7 +155,7 @@ To split germline VCF by chromosome, use this script : scripts/split_vcf_chromos
 * example :
 
 ```
-Rscript falcon.R /home/pgm/Workspace/MPM_bck/VCF_finaux/germline_sandbox/M662_DA_5009_N_B00JAJD_chromosomes/M662_DA_5009_N_B00JAJD.GERMLINE.chrY.vcf 5009 B00JAJD B00JAJB B00JAJC Y /home/pgm/Workspace/MPM_bck/VCF_finaux/tests /home/pgm/Workspace/MPM_bck/marathon/libs/falcon.output.R /home/pgm/Workspace/MPM_bck/marathon/libs/falcon.qc.R
+Rscript falcon.R /path/to/germline_VCF/splitted_by_chromosomes/sample.GERMLINE.chrY.vcf patient1 normal_sample_id tumor1_sample_id tumor2_sample_id Y /path/to/output/dir /path/to/marathon/libs/falcon.output.R /path/to/marathon/libs/falcon.qc.R
 ```
 
 ###### To get the copy numbers, in the other tumor regions with variations
