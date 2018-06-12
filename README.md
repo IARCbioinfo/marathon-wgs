@@ -38,7 +38,7 @@ Then the VCF output file has been filtered on _PASS_ value : scripts/keep_pass.s
 
 * tool : Strelka2
 * inputs : a tumor BAM file, its associated normal BAM file, human genome reference file, regions file
-* output : a normal VCF file
+* output : a tumor VCF file
 * scripts : scripts/cobalt/template_strelka2.sh, scripts/cobalt/launch_strelka2.sh
 
 Then the VCF output file has been filtered on _PASS_ value : scripts/keep_pass.sh.
