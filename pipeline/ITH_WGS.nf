@@ -38,7 +38,18 @@ patient_bams = bam.map { path -> [ path[1][0], path[2][0], path[3][0] ] }
 
 /** PROCESSES **/
 
-/* Etape de post-alignement à finir
+process reads_QC {
+  input:
+  // fastQC
+
+  output:
+  // some HTML files
+
+  shell:
+  // TODO
+}
+
+// Etape de post-alignement à finir
 process post_alignment {
   input:
   file i from all_bams
@@ -55,7 +66,6 @@ process post_alignment {
   //head -n1 !{i} > !{i}.HEAD
   '''
 }
-*/
 
 process germline_calling {
   input:
@@ -79,10 +89,50 @@ process somatic_calling {
   file input_regions
 
   output:
-  file("${i}.somatic.vcf") into VCF_germline
+  file("${i}.somatic.vcf") into VCF_somatic
 
   shell:
   '''
   strelka2.sh .......
   '''
+}
+
+process germline_tumor_coverage {
+  // Platypus
+}
+
+process somatic_tumor_coverage {
+  // Platypus
+}
+
+process quality_control {
+  // 4 scripts R
+}
+
+process split_VCF {
+  // split VCF by chromosome
+}
+
+process copy_numbers {
+  // run falcon
+}
+
+process copy_numbers_epsilon {
+  // run falcon_epsilon (to compute errors)
+}
+
+process compile_copy_numbers {
+  // compile falcon results in a TSV file
+}
+
+process MCMC {
+  // canopy pre-clustering & MCMC sampling
+}
+
+process tree {
+  // canopy tree
+}
+
+process filter {
+  // filter informative events
 }
