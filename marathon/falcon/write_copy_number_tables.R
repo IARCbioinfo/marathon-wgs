@@ -32,7 +32,7 @@ compile_ascn_tumor = function(patient_id, tumor_id) {
   colnames(ascn) = header
   for (chr in chromosomes) {
     input_folder_chr = paste(input_folder, "chr", chr, "/", sep="")
-    input_file_name = paste("falcon.patient_", patient_id, ".tumor_", tumor_id, ".chr_", chr, ".output.txt", sep="") # falcon.patient_5009.tumor_B00JAJB.chr_Y.output.txt
+    input_file_name = paste("falcon.patient_", patient_id, ".tumor_", tumor_id, ".chr_", chr, ".output.txt", sep="") 
     ascn_chr = data.frame(read.table(paste(input_folder_chr, input_file_name, sep=""), sep="\t", header=TRUE, stringsAsFactors=FALSE))
     ascn = rbind(ascn, ascn_chr)
   }

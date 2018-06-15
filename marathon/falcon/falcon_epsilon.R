@@ -12,6 +12,10 @@ if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 data_file_missing_epsilon = args[1]
 data_file_coordinates     = args[2]
 output_files              = args[3]
+lib_path                  = args[4]
+
+source(paste(lib_path, "/falcon.getASCN.epsilon.R", sep=''))
+source(paste(lib_path, "/falcon.output.R", sep=''))
 
 
 ##########################################
@@ -23,10 +27,6 @@ load(data_file_missing_epsilon)
 cat("####### ARGUMENTS #######\n")
 cat(paste("data_file_missing_epsilon: ", data_file_missing_epsilon, "\n", sep=''))
 cat(paste("data_file_coordinates: ", data_file_coordinates, "\n", sep=''))
-cat(paste("patient_id: ", patient_id, "\n", sep=''))
-cat(paste("tumor1_sample_id_primay: ", tumor1_sample_id, "\n", sep=''))
-cat(paste("tumor2_sample_id_relapse: ", tumor2_sample_id, "\n", sep=''))
-cat(paste("chr: ", chr, "\n", sep=''))
 cat(paste("output_files: ", output_files, "\n\n", sep=''))
 
 
@@ -107,7 +107,6 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
 
       if (!is.na(coordinates[i,]$Major.sd) || !is.na(coordinates[i,]$Minor.sd)) {
         tauhat.tumor_content = c(coordinates[i,]$st_snp, coordinates[i,]$end_snp)
-        source("/home/pgm/Workspace/MPM/marathon/libs/falcon.getASCN.epsilon.R")
         cn.tumor_content = falcon.getASCN.epsilon(readMatrix.tumor_content, tauhat=tauhat.tumor_content, rdep = rdep_tumor, threshold = 0.3)
 
         # falcon bugfix
@@ -124,7 +123,6 @@ process_chromosome = function(tumor_content, tOri_to_filter_content, chr, patien
         # segment boudaries.
         # For Canopy's input, we use Bootstrap-based method to estimate the
         # standard deviations for the allele-specific copy numbers.
-        source("/home/pgm/Workspace/MPM/marathon/libs/falcon.output.R")
         falcon.output=falcon.output(readMatrix = readMatrix.tumor_content,
                                     tauhat = tauhat.tumor_content,
                                     cn = cn.tumor_content,

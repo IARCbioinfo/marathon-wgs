@@ -165,6 +165,7 @@ Rscript falcon.R /path/to/germline_VCF/splitted_by_chromosomes/sample.GERMLINE.c
   * args[1] = tumor1 RDA file
   * args[2] = path to Falcon TXT file containing coordinates (give a path like "/home/pgm/Workspace/MPM/marathon/falcon/output/patient_##/chr6/falcon.patient_##.tumor_placeholder.chr_6.output.txt" so it can take tumor1 and tumor2 TXT file thanks to the placeholder)
   * args[3] = path to output directory
+  * args[4] = path to libs directory
 * outputs :
   * a TXT with the computed standard errors
 * script : marathon/falcon/falcon_epsilon.R
@@ -194,6 +195,7 @@ This step has been parallelized by number of subclones.
   * args[8] = path to tumor2 coverage VCF file at tumor1 positions
   * args[9] = path to output directory
   * args[10] = number of subclones to generate
+  * args[11] = path to libs directory
 * outputs :
   * a BIC file with bayesian Information Criterion score for this number of subclones
   * a SVG file with optimal number of clusters (non-informative without a comparison with others numbers of clusters)

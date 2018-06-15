@@ -11,16 +11,17 @@ args = commandArgs(trailingOnly = TRUE)
 if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 
 ##
-# input_folder                      = args[1]
-# patient_id                        = args[2]
-# tumor1_id                         = args[3]
-# tumor2_id                         = args[4]
-# input_somatic_VCF_t1              = args[5]
-# input_somatic_VCF_t2              = args[6]
-# input_somatic_VCF_t1_positions_t2 = args[7]
-# input_somatic_VCF_t2_positions_t1 = args[8]
-# output_path                       = args[9]
-# K                                 = args[10]
+input_folder                      = args[1]
+patient_id                        = args[2]
+tumor1_id                         = args[3]
+tumor2_id                         = args[4]
+input_somatic_VCF_t1              = args[5]
+input_somatic_VCF_t2              = args[6]
+input_somatic_VCF_t1_positions_t2 = args[7]
+input_somatic_VCF_t2_positions_t1 = args[8]
+output_path                       = args[9]
+K                                 = args[10]
+lib_path                          = args[11]
 
 ##
 cat("####### ARGUMENTS #######\n")
@@ -31,19 +32,7 @@ cat(paste("tumor2_id: ", tumor2_id, "\n", sep=''))
 cat(paste("K (nb subclones): ", K, "\n", sep=''))
 
 
-##########################################
-## Debug function
-##########################################
-# write_matrices = function() {
-#   write.table(C, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_C.tsv")
-#   write.table(Y, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Y.tsv")
-#   write.table(R, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_R.tsv")
-#   write.table(X, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_X.tsv")
-#   write.table(WM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_WM.tsv")
-#   write.table(Wm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_Wm.tsv")
-#   write.table(epsM, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsM.tsv")
-#   write.table(epsm, quote = F, file = "/home/pgm/Workspace/MPM/marathon/canopy/5009_epsm.tsv")
-# }
+source(paste(lib_path, "/custom_canopy.sample.cluster.R", sep=''))
 
 
 ##########################################
@@ -376,8 +365,6 @@ min.simrun   = 10000 # to increase later
 writeskip    = 100
 K = K:K
 
-source("/data/soudadel/MPM/canopy/scripts/custom_canopy.sample.cluster.R")
-# source("/home/pgm/Workspace/MPM/marathon/libs")
 sampchain = custom_canopy.sample.cluster(as.matrix(R), as.matrix(X),
                                          sna_cluster,
                                          as.matrix(WM), as.matrix(Wm),

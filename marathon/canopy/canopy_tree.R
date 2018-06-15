@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 
 library("Canopy")
-# source("/home/pgm/Workspace/MPM/marathon/libs/custom_canopy.plottree.R")
-source("/data/soudadel/MPM/canopy/scripts/custom_canopy.plottree.R")
+
 
 ##########################################
 ## Retrieve arguments
@@ -13,12 +12,14 @@ if (length(args)==0) { stop("Input name missing!\n", call.=FALSE) }
 ##
 patient_id = args[1]
 data_path  = args[2]
+lib_path   = args[3]
 
 ##
 cat("####### ARGUMENTS #######\n")
 cat(paste("patient_id: ", patient_id, "\n", sep=''))
 cat(paste("output_path: ", data_path, "\n", sep=''))
 
+source(paste(lib_path, "/custom_canopy.plottree.R", sep=''))
 
 
 ##########################################
